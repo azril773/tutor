@@ -1,7 +1,12 @@
-composer update
-composer install
-php artisan migrate
 
+# Tutor App
+
+
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+```
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=base64:iyB58hfinwUCUjtCaezZfdYl1wNNBnhw0ojh1R+w7XY=
@@ -9,7 +14,7 @@ APP_DEBUG=true
 APP_URL=http://localhost
 
 APP_LOCALE=en
-APP_FALLBACK_LOCALE=en  
+APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=en_US
 
 APP_MAINTENANCE_DRIVER=file
@@ -20,24 +25,6 @@ PHP_CLI_SERVER_WORKERS=4
 BCRYPT_ROUNDS=12
 
 LOG_CHANNEL=stack
-## Installation
-
-- Update package
-```bash
-composer update
-```
-- Install package
-```
-composerinstall
-```
-- Migrate database
-```
-php artisan migrate
-```
-- Run application
-```
-composer run dev
-```
 LOG_STACK=single
 LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=debug
@@ -87,6 +74,22 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 
 VITE_APP_NAME="${APP_NAME}"
 
+```
+## Installation
 
-
+- Update package
+```bash
+composer update
+```
+- Install package
+```
+composerinstall
+```
+- Migrate database
+```
+php artisan migrate
+```
+- Run application
+```
 composer run dev
+```
