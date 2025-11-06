@@ -32,6 +32,7 @@ export interface SharedData {
 
 
 export type Pribadi = {
+    id: number
     nama_lengkap: string
     email: string
     nowa: string
@@ -51,6 +52,7 @@ export type Pribadi = {
 }
 
 export type Institusi = {
+    id: number
     institusi: string
     status_pekerjaan: string
     masa_kerja: string
@@ -60,6 +62,7 @@ export type Institusi = {
 
 
 export type Pendidikan = {
+    id: number
     perguruan_tinggi: string;
     jenjang: string;
     bidang_studi: string;
@@ -68,12 +71,24 @@ export type Pendidikan = {
     gelar_belakang: string;
 };
 
+export type Dokumen = {
+    id: number
+    cv: string
+    ijazah: string
+    rps: string
+    foto_ktp: string
+    buku_tabungan: string
+    surat_ketersediaan: string
+}
 
 export type User = {
     id: number;
     email: string;
     password: string;
     pribadi: Pribadi
+    institusi: Institusi
+    pendidikan: Pendidikan[]
+    dokumen: Dokumen
 };
 
 export type Fakultas = {

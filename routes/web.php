@@ -33,7 +33,10 @@ Route::middleware(['customAuth'])->group(function () {
     Route::post('biodata', [DashboardController::class, 'updateBiodata'])->name('updateBiodata');
     Route::post('proses-lamaran', [DashboardController::class, 'prosesLamaran'])->name('prosesLamaran');
     Route::post('approve', [DashboardController::class, 'approveLamaran'])->name('approveLamaran');
+    Route::get('dashboard/tutor/{id}', [DashboardController::class, 'detailTutor'])->name('detailTutor');
     
+    Route::get('/files/{path}', [DashboardController::class, 'download'])
+     ->where('path', '.*')->name('files.download');
     
     Route::get('reset-password', [DashboardController::class, 'resetPassword'])->name('resetPassword');
 
@@ -49,4 +52,3 @@ Route::middleware(['customAuth'])->group(function () {
 });
 
 require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';

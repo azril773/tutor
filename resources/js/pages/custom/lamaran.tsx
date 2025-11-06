@@ -5,6 +5,7 @@ import {
     LamaranType,
     Matkul,
     Prodi,
+    User,
     type BreadcrumbItem,
 } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
@@ -12,6 +13,7 @@ import { useRef, useState } from 'react';
 import DialogLamaran from './_components/dialog-lamaran';
 import FormLamaran from './_components/form-lamaran';
 import TableLamaran from './_components/table-lamaran';
+import TableTutor from './_components/table-tutor';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Lamaran',
@@ -25,14 +27,16 @@ export default function Lamaran({
     matkul,
     lamaran,
     role,
+    tutors
 }: {
     fakultas: Fakultas[];
     prodi: Prodi[];
     matkul: Matkul[];
     lamaran: LamaranType[];
     role: string;
+    tutors: User[]
 }) {
-    console.log(lamaran);
+    console.log(tutors);
     const { errors, flash } = usePage().props;
     const [prodiByFakultas, setProdiByFakultas] = useState<Array<Prodi>>([]);
     const [matkulByProdi, setMatkulByProdi] = useState<Array<Matkul>>([]);
@@ -78,6 +82,12 @@ export default function Lamaran({
                         Data Lamaran
                     </span>
                     <TableLamaran data={lamaran} role={role} />
+                </div>
+                <div className="w-full">
+                    <span className="font-sans font-semibold">
+                        Data Tutor
+                    </span>
+                    <TableTutor data={tutors} role={role} />
                 </div>
             </div>
         </AppLayout>

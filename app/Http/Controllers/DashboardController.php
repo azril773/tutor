@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
+use function Termwind\render;
+
 class DashboardController extends Controller
 {
     //
@@ -30,6 +32,7 @@ class DashboardController extends Controller
         $fakultas = Fakultas::all();
         $prodi = Prodi::with("fakultas")->get();
         $maktul = Matkul::with("prodi")->get();
+        $tutors = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->get();
         $user = Auth::guard("user_login")->user();
         $role = $user->role;
         if ($role === "admin") {
@@ -43,6 +46,7 @@ class DashboardController extends Controller
             "matkul" => $maktul,
             "lamaran" => $lamaran,
             "role" => $role,
+            "tutors" => $tutors
         ]);
     }
     //
@@ -267,22 +271,23 @@ class DashboardController extends Controller
             }
 
             $extCv = $req->file("cv")->extension();
-            $pathCv = $req->file("cv")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
+            $pathCv = $req->file("cv")->store("dokumen", 'public');
+
             $extIjazah = $req->file("ijazah")->extension();
-            $pathIjazah = $req->file("ijazah")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
+            $pathIjazah = $req->file("ijazah")->store("dokumen", 'public');
 
             $extRps = $req->file("rps")->extension();
-            $pathRps = $req->file("rps")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
+            $pathRps = $req->file("rps")->store("dokumen", 'public');
 
             $extFotoKtp = $req->file("fotoKtp")->extension();
-            $pathFotoKtp = $req->file("fotoKtp")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
-            
+            $pathFotoKtp = $req->file("fotoKtp")->store("dokumen", 'public');
+
             $extBukuTabungan = $req->file("bukuTabungan")->extension();
-            $pathBukuTabungan = $req->file("bukuTabungan")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
+            $pathBukuTabungan = $req->file("bukuTabungan")->store("dokumen", 'public');
 
             $extSuratKetersediaan = $req->file("suratKetersediaan")->extension();
-            $pathSuratKetersediaan = $req->file("suratKetersediaan")->storeAs("dokumen", now()->timestamp . "_" . $user->username . '.' . $extCv, 'public');
-
+            $pathSuratKetersediaan = $req->file("suratKetersediaan")->store("dokumen", 'public');
+            Log::debug($pathFotoKtp);
             $dokumen = Dokumen::updateOrCreate(
                 ["user_id" => $id],
                 [
@@ -295,10 +300,24 @@ class DashboardController extends Controller
                 ]
             );
             DB::commit();
-            Session::flash("success","Berhasil update biodata");
+            Session::flash("success", "Berhasil update biodata");
         } catch (Exception $e) {
             Log::error($e);
             DB::rollBack();
         }
     }
+
+    public function detailTutor(Request $req, string $id) {
+        $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
+        return Inertia::render("custom/detail", [
+            "user" => $tutor,
+        ]);
+    }
+
+    public function download(string $path) {
+    $fullPath = Storage::disk('public')->path($path);
+    abort_unless(Storage::disk('public')->exists($path), 404);
+
+    return response()->download($fullPath);
+}
 }
