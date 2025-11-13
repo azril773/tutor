@@ -71,6 +71,15 @@ export type Pendidikan = {
     gelar_belakang: string;
 };
 
+export type PendidikanPayload = {
+    perguruan_tinggi: string;
+    jenjang: string;
+    bidang_studi: string;
+    tahun_lulus: string;
+    gelar_depan: string;
+    gelar_belakang: string;
+}
+
 export type Dokumen = {
     id: number
     cv: string

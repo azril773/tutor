@@ -3,20 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Pendidikan } from '@/types';
+import { Pendidikan, PendidikanPayload } from '@/types';
 import { Trash } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 import { NumericFormat } from 'react-number-format';
-
-
 
 export default function DataPendidikan({
     pendidikan,
     setPendidikan,
     pdkError,
 }: {
-    pendidikan: Pendidikan[];
-    setPendidikan: Dispatch<SetStateAction<Pendidikan[]>>;
+    pendidikan: Array<PendidikanPayload>;
+    setPendidikan: Dispatch<SetStateAction<Array<PendidikanPayload>>>;
     pdkError: Record<string, Partial<Pendidikan>>;
 }) {
     const handleTambahPendidikan = () => {

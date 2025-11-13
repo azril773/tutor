@@ -171,14 +171,14 @@ class DashboardController extends Controller
 
     public function updateBiodata(Request $req)
     {
-        // $validated = $req->validate([
-        //     "id" => "required|string",
-        //     'cv' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        //     'ijazah' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        //     'rps' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        //     'foto_ktp' => 'mimes:jpg,jpeg,png,gif,webp',
-        //     'suratKetersediaan' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        // ]);
+        $validated = $req->validate([
+            "id" => "required|string",
+            'cv' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ijazah' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'rps' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'foto_ktp' => 'mimes:jpg,jpeg,png,gif,webp',
+            'suratKetersediaan' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ]);
         $id = $req->id;
         $user = UserLogin::where("id", $id)->first();
 
@@ -308,6 +308,7 @@ class DashboardController extends Controller
     }
 
     public function detailTutor(Request $req, string $id) {
+        if (Auth::guard("user_login")->user()->role === "tutor") return redirect()->back();
         $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
         return Inertia::render("custom/detail", [
             "user" => $tutor,

@@ -83,12 +83,14 @@ export default function Lamaran({
                     </span>
                     <TableLamaran data={lamaran} role={role} />
                 </div>
+                {role === 'admin' && (
                 <div className="w-full">
                     <span className="font-sans font-semibold">
                         Data Tutor
                     </span>
                     <TableTutor data={tutors} role={role} />
                 </div>
+                )}
             </div>
         </AppLayout>
     );

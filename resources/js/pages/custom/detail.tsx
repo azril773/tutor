@@ -356,9 +356,6 @@ export default function Show({
             </div>
 
             {/* Status Badge */}
-            <div className="mt-4 flex items-center gap-2">
-              <Badge variant="default">Aktif</Badge>
-            </div>
           </div>
         </div>
 
@@ -413,18 +410,12 @@ export default function Show({
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">Jenis Kelamin</p>
                             <p className="text-sm">
-                              {user.pribadi?.jk === "L" ? (
-                                <Badge variant="outline">Laki-laki</Badge>
-                              ) : user.pribadi?.jk === "P" ? (
-                                <Badge variant="outline">Perempuan</Badge>
-                              ) : (
-                                "—"
-                              )}
+                                <Badge variant="outline" className="capitalize">{user.pribadi.jk}</Badge>
                             </p>
                           </div>
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">Tanggal Lahir</p>
-                            <p className="text-sm">{formatDate(user.pribadi?.tgl_lahir.toLocaleString())}</p>
+                            <p className="text-sm">{user.pribadi?.tgl_lahir ?formatDate(user.pribadi?.tgl_lahir.toLocaleString()) : '-'}</p>
                           </div>
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">NIP</p>

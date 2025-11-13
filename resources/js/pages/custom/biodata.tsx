@@ -2,14 +2,20 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Institusi, Pendidikan, Pribadi } from '@/types';
+import {
+    BreadcrumbItem,
+    Institusi,
+    Pendidikan,
+    PendidikanPayload,
+    Pribadi,
+} from '@/types';
+import { usePage } from '@inertiajs/react';
 import { FileText, Landmark, University, Users } from 'lucide-react';
 import { useState } from 'react';
 import DataInstitusi from '../auth/components/data-institusi';
 import DataPendidikan from '../auth/components/data-pendidikan';
 import DataPribadi from '../auth/components/data-pribadi';
 import Dokumen from '../auth/components/dokumen';
-import { usePage } from '@inertiajs/react';
 
 export default function Biodata({
     idUser,
@@ -18,11 +24,11 @@ export default function Biodata({
     dataPendidikan,
 }: {
     idUser: string;
-    dataPribadi: Pribadi;
+    dataPribadi: Pribadi | null;
     dataInstitusi?: Institusi;
     dataPendidikan: Pendidikan[];
 }) {
-    const page = usePage()
+    const page = usePage();
     const arrayMenu: string[] = [
         'pribadi',
         'institusi',
@@ -36,31 +42,41 @@ export default function Biodata({
 
     // Data pribadi
     const [namalengkap, setNamaLengkap] = useState<string>(
-        dataPribadi.nama_lengkap,
+        dataPribadi?.nama_lengkap ?? '',
     );
-    const [email, setEmail] = useState<string>(dataPribadi.email);
+    const [email, setEmail] = useState<string>(dataPribadi?.email ?? '');
     const [tglLahir, setTglLahir] = useState<Date | undefined>(
-        dataPribadi.tgl_lahir ?? undefined,
+        dataPribadi?.tgl_lahir ?? undefined,
     );
-    const [jk, setJk] = useState<string>(dataPribadi.jk);
-    const [nowa, setNowa] = useState<string>(dataPribadi.nowa);
-    const [nip, setNip] = useState<string>(dataPribadi.nip);
-    const [nik, setNik] = useState<string>(dataPribadi.nik);
-    const [nidn, setNidn] = useState<string>(dataPribadi.nidn);
-    const [provinsi, setProvinsi] = useState<string>(dataPribadi.provinsi);
-    const [kabkot, setKabkot] = useState<string>(dataPribadi.kabkot);
-    const [kodePos, setKodePos] = useState<string>(dataPribadi.kodepos);
-    const [alamat, setAlamat] = useState<string>(dataPribadi.alamat);
-    const [norek, setNorek] = useState<string>(dataPribadi.norek);
-    const [atasNama, setAtasNama] = useState<string>(dataPribadi.atas_nama);
-    const [namaBank, setNamaBank] = useState<string>(dataPribadi.nama_bank);
+    const [jk, setJk] = useState<string>(dataPribadi?.jk ?? '');
+    const [nowa, setNowa] = useState<string>(dataPribadi?.nowa ?? '');
+    const [nip, setNip] = useState<string>(dataPribadi?.nip ?? '');
+    const [nik, setNik] = useState<string>(dataPribadi?.nik ?? '');
+    const [nidn, setNidn] = useState<string>(dataPribadi?.nidn ?? '');
+    const [provinsi, setProvinsi] = useState<string>(dataPribadi?.provinsi ?? '');
+    const [kabkot, setKabkot] = useState<string>(dataPribadi?.kabkot ?? '');
+    const [kodePos, setKodePos] = useState<string>(dataPribadi?.kodepos ?? '');
+    const [alamat, setAlamat] = useState<string>(dataPribadi?.alamat ?? '');
+    const [norek, setNorek] = useState<string>(dataPribadi?.norek ?? '');
+    const [atasNama, setAtasNama] = useState<string>(dataPribadi?.atas_nama ?? '');
+    const [namaBank, setNamaBank] = useState<string>(dataPribadi?.nama_bank ?? '');
 
     // data institusi
-    const [institusi, setInstitusi] = useState<string>(dataInstitusi?.institusi ?? '');
-    const [statusPekerjaan, setStatusPekerjaan] = useState<string>(dataInstitusi?.status_pekerjaan ?? '');
-    const [masaKerja, setMasaKerja] = useState<string>(dataInstitusi?.masa_kerja ?? '');
-    const [pangkat, setPangkat] = useState<string>(dataInstitusi?.pangkat ?? '');
-    const [bidangPekerjaan, setBidangPekerjaan] = useState<string>(dataInstitusi?.bidang_pekerjaan ?? '');
+    const [institusi, setInstitusi] = useState<string>(
+        dataInstitusi?.institusi ?? '',
+    );
+    const [statusPekerjaan, setStatusPekerjaan] = useState<string>(
+        dataInstitusi?.status_pekerjaan ?? '',
+    );
+    const [masaKerja, setMasaKerja] = useState<string>(
+        dataInstitusi?.masa_kerja ?? '',
+    );
+    const [pangkat, setPangkat] = useState<string>(
+        dataInstitusi?.pangkat ?? '',
+    );
+    const [bidangPekerjaan, setBidangPekerjaan] = useState<string>(
+        dataInstitusi?.bidang_pekerjaan ?? '',
+    );
 
     const [cv, setCv] = useState<File | null>(null);
     const [ijazah, setIjazah] = useState<File | null>(null);
@@ -76,7 +92,7 @@ export default function Biodata({
     const [pdkError, setPdkError] = useState<
         Record<string, Partial<Pendidikan>>
     >({});
-    const [pendidikan, setPendidikan] = useState<Array<Pendidikan>>(
+    const [pendidikan, setPendidikan] = useState<Array<PendidikanPayload>>(
         dataPendidikan.length > 0
             ? dataPendidikan
             : [
@@ -97,18 +113,18 @@ export default function Biodata({
                 setView('pribadi');
                 break;
             case 'institusi':
-                // if (!checkErrorPribadi()) return false;
+                if (!checkErrorPribadi()) return false;
                 setView('institusi');
                 break;
             case 'pendidikan':
-                // if (!checkErrorPribadi()) return false;
-                // if (!checkErrorInstitusi()) return false;
+                if (!checkErrorPribadi()) return false;
+                if (!checkErrorInstitusi()) return false;
                 setView('pendidikan');
                 break;
             case 'dokumen':
-                // if (!checkErrorPribadi()) return false;
-                // if (!checkErrorInstitusi()) return false;
-                // if (!checkErrorPendidikan()) return false;
+                if (!checkErrorPribadi()) return false;
+                if (!checkErrorInstitusi()) return false;
+                if (!checkErrorPendidikan()) return false;
 
                 setView('dokumen');
                 break;
@@ -139,7 +155,8 @@ export default function Biodata({
         if (namaBank.length <= 0)
             tempError['namaBank'] = 'Form ini harus diisi.';
 
-        setError(tempError);
+        console.log("OKOKOk")
+        setError(tempError);    
         return Object.keys(tempError).length === 0;
     };
 
@@ -201,7 +218,10 @@ export default function Biodata({
         formData.append('id', idUser);
         formData.append('namaLengkap', namalengkap);
         formData.append('email', email);
-        formData.append('tgl_lahir', new Date(tglLahir ?? '')?.toISOString() ?? '');
+        formData.append(
+            'tgl_lahir',
+            new Date(tglLahir ?? '')?.toISOString() ?? '',
+        );
         formData.append('jk', jk);
         formData.append('nowa', nowa);
         formData.append('nip', nip);
@@ -323,7 +343,9 @@ export default function Biodata({
                     <span className="text-sm text-red-500">{value}</span>
                 ))}
                 {page.props.flash.success && (
-                    <span className="text-sm text-green-500">{page.props.flash.success}</span>
+                    <span className="text-sm text-green-500">
+                        {page.props.flash.success}
+                    </span>
                 )}
                 <section className="mx-10 my-10">
                     <section

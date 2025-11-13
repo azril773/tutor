@@ -45,6 +45,7 @@ export default function TableTutor({
     data: Array<User>;
     role: string;
 }) {
+    console.log(data)
     const approveRef = useRef<HTMLButtonElement | null>(null);
     const [open, setIsOpen] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -74,7 +75,7 @@ export default function TableTutor({
         {
             id: 'tgl_lahir',
             header: 'Tanggal Lahir',
-            cell: ({ row }) => <>{row.original.pribadi.tgl_lahir}</>,
+            cell: ({ row }) => <>{row.original.pribadi.tgl_lahir ?? '-'}</>,
         },
         {
             id: 'action',
