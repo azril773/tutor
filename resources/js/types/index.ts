@@ -20,6 +20,7 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    groups: string[]
 }
 
 export interface SharedData {
@@ -128,3 +129,7 @@ export type LamaranType = {
     user_login: User;
     matkul: Matkul;
 };
+
+
+export const BASEURL = "http://localhost:8000"
+export const DEFAULT_ERROR_MESSAGE = "Terjadi Kesalahan"

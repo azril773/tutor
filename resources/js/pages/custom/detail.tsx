@@ -410,7 +410,7 @@ export default function Show({
                           <div>
                             <p className="text-xs font-medium text-muted-foreground">Jenis Kelamin</p>
                             <p className="text-sm">
-                                <Badge variant="outline" className="capitalize">{user.pribadi.jk}</Badge>
+                                <Badge variant="outline" className="capitalize">{user.pribadi?.jk ?? '-'}</Badge>
                             </p>
                           </div>
                           <div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class login extends Controller
@@ -27,5 +28,7 @@ class login extends Controller
             $req->session()->regenerate();
             return redirect()->intended(route('dashboard', absolute: false));
         }
+        Session::flash("error","Login gagal");
+        return redirect()->intended("/user_login");
     }
 }

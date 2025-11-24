@@ -25,18 +25,15 @@ export default function Lamaran({
     fakultas,
     prodi,
     matkul,
-    lamaran,
     role,
-    tutors
+    user_id
 }: {
     fakultas: Fakultas[];
     prodi: Prodi[];
     matkul: Matkul[];
-    lamaran: LamaranType[];
     role: string;
-    tutors: User[]
+    user_id: string;
 }) {
-    console.log(tutors);
     const { errors, flash } = usePage().props;
     const [prodiByFakultas, setProdiByFakultas] = useState<Array<Prodi>>([]);
     const [matkulByProdi, setMatkulByProdi] = useState<Array<Matkul>>([]);
@@ -58,6 +55,9 @@ export default function Lamaran({
 
                 {flash.error && (
                     <span className="text-sm text-red-500">{flash.error}</span>
+                )}
+                {flash.success && (
+                    <span className="text-sm text-green-500">{flash.success}</span>
                 )}
                 {role === 'tutor' && (
                     <FormLamaran
@@ -81,14 +81,14 @@ export default function Lamaran({
                     <span className="font-sans font-semibold">
                         Data Lamaran
                     </span>
-                    <TableLamaran data={lamaran} role={role} />
+                    <TableLamaran user_id={role === 'admin' ? undefined : user_id} role={role} />
                 </div>
                 {role === 'admin' && (
                 <div className="w-full">
                     <span className="font-sans font-semibold">
                         Data Tutor
                     </span>
-                    <TableTutor data={tutors} role={role} />
+                    <TableTutor role={role} />
                 </div>
                 )}
             </div>

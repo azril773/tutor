@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomAuth\login;
 use App\Http\Controllers\CustomAuth\registrasi;
 use App\Http\Controllers\CustomAuth\ResetPassword;
@@ -15,8 +16,7 @@ Route::get('/', function () {
 
 
 Route::get("registrasi", function (Request $req) {
-    $token = $req->session()->token();
-    return Inertia::render("auth/registrasi", ["token" => $token]);
+    return Inertia::render("auth/registrasi");
 });
 
 
@@ -38,10 +38,16 @@ Route::middleware(['customAuth'])->group(function () {
     Route::get('/files/{path}', [DashboardController::class, 'download'])
      ->where('path', '.*')->name('files.download');
     
-    Route::get('reset-password', [DashboardController::class, 'resetPassword'])->name('resetPassword');
+     Route::get('reset-password', [DashboardController::class, 'resetPassword'])->name('resetPassword');
+     
+     Route::post('reset-password-post', [DashboardController::class, 'resetPasswordPost'])->name('resetPasswordPost');
+     
+     // Admin
+    //  Route::get('admin', [AdminController::class, 'view'])->name('adminView');
+     Route::get('tutors', [DashboardController::class, 'getTutors'])->name('getTutors');
+     Route::get('applications', [DashboardController::class, 'getApplications'])->name('getApplications');
 
-    Route::post('reset-password-post', [DashboardController::class, 'resetPasswordPost'])->name('resetPasswordPost');
-
+    
 
     Route::get("logout", function(Request $req) {
         Auth::guard('user_login')->logout();

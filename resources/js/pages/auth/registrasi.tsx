@@ -10,11 +10,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Form, Link } from '@inertiajs/react';
+import { Form, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 
-export default function Registrasi({ token }: { token: string }) {
+export default function Registrasi() {
+    const { flash } = usePage().props;
     const [namaLengkap, setNamaLengkap] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [nik, setNik] = useState<string>('');
@@ -31,22 +32,26 @@ export default function Registrasi({ token }: { token: string }) {
                             >
                                 Login
                             </Link>
-                            <Link
-                                href={'/registrasi'}
-                                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                            >
-                                Registrasi
-                            </Link>
+                            s{' '}
                         </>
                     </nav>
                 </header>
-                <span className="hidden" id="token">
-                    {token}
-                </span>
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
                         <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <Form {...registrasi.registrasi_user.form()} method='post'>
+                            {flash.error && (
+                                <div className='my-1'>
+                                    <br />
+                                    <span className="text-sm text-red-500">
+                                        {flash.error}
+                                    </span>
+                                </div>
+                            )}
+                            <br />
+                            <Form
+                                {...registrasi.registrasi_user.form()}
+                                method="post"
+                            >
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <InputComponent
@@ -126,7 +131,7 @@ export default function Registrasi({ token }: { token: string }) {
                                     </div>
                                 </div>
                                 <div className="flex w-full justify-end">
-                                    <Button type='submit'>Registrasi</Button>
+                                    <Button type="submit">Registrasi</Button>
                                 </div>
                             </Form>
                         </div>

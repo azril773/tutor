@@ -1,4 +1,5 @@
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import PaginationStateful from '@/components/custom/pagination-stateful';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,271 +23,154 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { GetApplications } from '@/pages/_api/lamaran';
+import EmptyState from '@/pages/auth/components/empty-state';
 import { LamaranType } from '@/types';
-import { Form } from '@inertiajs/react';
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    SortingState,
-    useReactTable,
-    VisibilityState,
-} from '@tanstack/react-table';
+import { Form, usePage } from '@inertiajs/react';
 import { MoreHorizontal } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function TableLamaran({
-    data,
+    user_id,
     role,
 }: {
-    data: Array<LamaranType>;
+    user_id?: string;
     role: string;
 }) {
-    const approveRef = useRef<HTMLButtonElement | null>(null);
-    const [open, setIsOpen] = useState<boolean>(false);
-    const [selectedId, setSelectedId] = useState<number | null>(null);
-    const columnsAdmin: ColumnDef<LamaranType>[] = [
-        {
-            id: 'nama',
-            header: 'Nama Tutor',
-            cell: ({ row }) => <>{row.original.user_login.pribadi.nama_lengkap}</>,
-            filterFn: (row, id, value) => {
-                return row.original.user_login.pribadi.nama_lengkap
-                    .toLowerCase()
-                    .includes(value.toLowerCase());
-            },
-        },
-        {
-            id: 'fakultas',
-            header: 'Fakultas',
-            cell: ({ row }) => {
-                console.log(row.original);
-                return <>{row.original.matkul.prodi.fakultas.nama}</>;
-            },
-        },
-        {
-            id: 'prodi',
-            header: 'Prodi',
-            cell: ({ row }) => <>{row.original.matkul.prodi.nama}</>,
-        },
-        {
-            id: 'matkul',
-            header: 'Matkul',
-            cell: ({ row }) => <>{row.original.matkul.nama}</>,
-        },
-        {
-            id: 'status',
-            header: 'Status',
-            cell: ({ row }) => {
-                return (
-                    <>
-                        <Badge
-                            variant={`secondary`}
-                            className={`${row.original.status === 'APPROVED' ? 'bg-blue-500 text-white dark:bg-blue-600' : ''}`}
-                        >
-                            {row.original.status}
-                        </Badge>
-                    </>
-                );
-            },
-        },
-        {
-            id: 'action',
-            enableHiding: false,
-            cell: ({ row }) => {
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    setIsOpen(true);
-                                    setSelectedId(row.original.id);
-                                }}
-                            >
-                                Approve
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                );
-            },
-        },
-    ];
-    const columns: ColumnDef<LamaranType>[] = [
-        {
-            id: 'nama',
-            header: 'Nama Tutor',
-            cell: ({ row }) => <>{row.original.user_login.pribadi.nama_lengkap}</>,
-            filterFn: (row, id, value) => {
-                return row.original.user_login.pribadi.nama_lengkap
-                    .toLowerCase()
-                    .includes(value.toLowerCase());
-            },
-        },
-        {
-            id: 'fakultas',
-            header: 'Fakultas',
-            cell: ({ row }) => {
-                console.log(row.original);
-                return <>{row.original.matkul.prodi.fakultas.nama}</>;
-            },
-        },
-        {
-            id: 'prodi',
-            header: 'Prodi',
-            cell: ({ row }) => <>{row.original.matkul.prodi.nama}</>,
-        },
-        {
-            id: 'matkul',
-            header: 'Matkul',
-            cell: ({ row }) => <>{row.original.matkul.nama}</>,
-        },
-        {
-            id: 'status',
-            header: 'Status',
-            cell: ({ row }) => {
-                return (
-                    <>
-                        <Badge
-                            variant={`secondary`}
-                            className={`${row.original.status === 'APPROVED' ? 'bg-blue-500 text-white dark:bg-blue-600' : ''}`}
-                        >
-                            {row.original.status}
-                        </Badge>
-                    </>
-                );
-            },
-        },
-    ];
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        {},
-    );
-    const [rowSelection, setRowSelection] = useState({});
-    const table = useReactTable({
-        data,
-        columns: role === 'admin' ? columnsAdmin : columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
-    });
+    const props = usePage().props;
+    const [data, setData] = useState<LamaranType[]>([]);
+    const [selectedId, setSelectedId] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPage, setTotalPage] = useState<number>(1);
+    const [nama, setNama] = useState<string>('');
+
+    const [open, setOpen] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+
+    const loadData = async () => {
+        const { data, totalPage, error } = await GetApplications({
+            csrf_token: props.csrf_token,
+            currentPage,
+            nama,
+            user_id,
+        });
+        if (error.length > 0) {
+            setError(error);
+            setData([]);
+        } else {
+            setData(data);
+            console.log(totalPage)
+            setTotalPage(totalPage);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [currentPage]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            loadData();
+        }, 300);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [nama]);
 
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Cari berdasarkan nama"
-                    value={
-                        (table.getColumn('nama')?.getFilterValue() as string) ??
-                        ''
-                    }
-                    onChange={(event) =>
-                        table
-                            .getColumn('nama')
-                            ?.setFilterValue(event.target.value)
-                    }
+                    value={nama}
+                    onChange={(value) => setNama(value.currentTarget.value)}
                     className="max-w-sm"
                 />
             </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
+                        <TableRow>
+                            <TableHead>Nama Tutor</TableHead>
+                            <TableHead>Fakultas</TableHead>
+                            <TableHead>Prodi</TableHead>
+                            <TableHead>Matkul</TableHead>
+                            <TableHead>Status</TableHead>
+                            {role === 'admin' && <TableHead></TableHead>}
+                        </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
+                        {data.length === 0 && <EmptyState colspan={6} />}
+                        {data.map((dt, index) => (
+                            <TableRow key={index}>
+                                <TableCell>
+                                    {dt.user_login?.pribadi?.nama_lengkap ??
+                                        '-'}
                                 </TableCell>
+                                <TableCell>
+                                    {dt.matkul?.prodi?.fakultas?.nama ?? '-'}
+                                </TableCell>
+                                <TableCell>{dt.matkul?.prodi?.nama}</TableCell>
+                                <TableCell>{dt.matkul?.nama}</TableCell>
+                                <TableCell>
+                                    {dt.status === 'PENDING' ? (
+                                        <Badge variant={'secondary'}>
+                                            {dt.status}
+                                        </Badge>
+                                    ) : (
+                                        <Badge
+                                            variant="secondary"
+                                            className="bg-blue-500 text-white dark:bg-blue-600"
+                                        >
+                                            {dt.status}
+                                        </Badge>
+                                    )}
+                                </TableCell>
+                                {role === 'admin' && (
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    className="h-8 w-8 p-0"
+                                                >
+                                                    <span className="sr-only">
+                                                        Open menu
+                                                    </span>
+                                                    <MoreHorizontal />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setOpen(true);
+                                                        setSelectedId(
+                                                            dt.id.toString(),
+                                                        );
+                                                    }}
+                                                >
+                                                    Approve
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                )}
                             </TableRow>
-                        )}
+                        ))}
                     </TableBody>
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
                 <div className="space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Next
-                    </Button>
+                    <PaginationStateful
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPage}
+                    />
                 </div>
             </div>
-            <Dialog open={open} onOpenChange={(value) => setIsOpen(value)}>
+            <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
@@ -298,13 +182,13 @@ export default function TableLamaran({
                                 <input
                                     type="hidden"
                                     name="id"
-                                    value={selectedId ?? ''}
+                                    value={selectedId}
                                 />
                                 <Button
                                     type="submit"
                                     className="cursor-pointer"
                                     onClick={() => {
-                                        setIsOpen(false);
+                                        setOpen(false);
                                     }}
                                 >
                                     Approve

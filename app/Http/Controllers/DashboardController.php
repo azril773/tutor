@@ -35,17 +35,12 @@ class DashboardController extends Controller
         $tutors = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->get();
         $user = Auth::guard("user_login")->user();
         $role = $user->role;
-        if ($role === "admin") {
-            $lamaran = Lamaran::with(["matkul.prodi.fakultas", "user_login.pribadi"])->get();
-        } else {
-            $lamaran = Lamaran::with(["matkul.prodi.fakultas", "user_login.pribadi"])->where("user_id", $user->id)->get();
-        }
         return Inertia::render("custom/lamaran", [
             "fakultas" => $fakultas,
             "prodi" => $prodi,
             "matkul" => $maktul,
-            "lamaran" => $lamaran,
             "role" => $role,
+            "user_id" => $user->id,
             "tutors" => $tutors
         ]);
     }
@@ -84,6 +79,11 @@ class DashboardController extends Controller
         }
 
         $user = Auth::guard("user_login")->user();
+        if ($user->role !== 'tutor') {
+            return redirect()->back()->withErrors([
+                "error" => "Access denied!"
+            ]);
+        }
         $pribadi = Pribadi::where("user_id", $user->id)->first();
         $institusi = Institusi::where("user_id", $user->id)->first();
         $pendidikan = Pendidikan::where("user_id", $user->id)->first();
@@ -104,6 +104,7 @@ class DashboardController extends Controller
         $lamaran->status = "PENDING";
         $lamaran->user_id = $user->id;
         $lamaran->matkul_id = $getMatkul[0]->id;
+        Session::flash("success", "Berhasil melamar");
         $lamaran->save();
     }
 
@@ -132,6 +133,7 @@ class DashboardController extends Controller
         $lamaran->update([
             "status" => "APPROVED"
         ]);
+        Session::flash("success", 'Berhasil approve lamaran');
         return redirect()->intended("/dashboard");
     }
 
@@ -270,22 +272,16 @@ class DashboardController extends Controller
                 Storage::disk("public")->delete($dokumen->surat_ketersediaan);
             }
 
-            $extCv = $req->file("cv")->extension();
             $pathCv = $req->file("cv")->store("dokumen", 'public');
 
-            $extIjazah = $req->file("ijazah")->extension();
             $pathIjazah = $req->file("ijazah")->store("dokumen", 'public');
 
-            $extRps = $req->file("rps")->extension();
             $pathRps = $req->file("rps")->store("dokumen", 'public');
 
-            $extFotoKtp = $req->file("fotoKtp")->extension();
             $pathFotoKtp = $req->file("fotoKtp")->store("dokumen", 'public');
 
-            $extBukuTabungan = $req->file("bukuTabungan")->extension();
             $pathBukuTabungan = $req->file("bukuTabungan")->store("dokumen", 'public');
 
-            $extSuratKetersediaan = $req->file("suratKetersediaan")->extension();
             $pathSuratKetersediaan = $req->file("suratKetersediaan")->store("dokumen", 'public');
             Log::debug($pathFotoKtp);
             $dokumen = Dokumen::updateOrCreate(
@@ -307,18 +303,91 @@ class DashboardController extends Controller
         }
     }
 
-    public function detailTutor(Request $req, string $id) {
-        if (Auth::guard("user_login")->user()->role === "tutor") return redirect()->back();
-        $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
+    public function detailTutor(Request $req, string $id)
+    {
+        $user = Auth::guard("user_login")->user();
+        if ($user->role === "tutor") {
+            Log::debug($user->id != $id);
+            if ($user->id != $id) return redirect()->intended("/dashboard");
+            $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
+        } else {
+            $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
+        }
         return Inertia::render("custom/detail", [
             "user" => $tutor,
         ]);
     }
 
-    public function download(string $path) {
-    $fullPath = Storage::disk('public')->path($path);
-    abort_unless(Storage::disk('public')->exists($path), 404);
+    public function download(string $path)
+    {
+        $fullPath = Storage::disk('public')->path($path);
+        abort_unless(Storage::disk('public')->exists($path), 404);
 
-    return response()->download($fullPath);
-}
+        return response()->download($fullPath);
+    }
+
+     public function getTutors(Request $req)
+    {
+        $user = Auth::guard("user_login")->user();
+        if ($user->role == 'admin') {
+            return response()->json([
+                "data" => [],
+                "totalPage" => 0
+            ]);
+        }
+        $limit = 10;
+        $currentPage = intval($req->query("page")) ?? 1;
+        $nama = $req->query("nama") ?? '';
+        $skip = ($currentPage - 1) * $limit;
+
+        $tutors = UserLogin::with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
+            Log::debug($nama);
+            $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
+        });
+        $count = $tutors->count();
+        return response()->json([
+            "data" => $tutors->skip($skip)->take($limit)->get(),
+            "totalPage" => ceil($count / $limit)
+        ]);
+    }
+    public function getApplications(Request $req)
+    {
+        $limit = 10;
+        $currentPage = intval($req->query("page")) ?? 1;
+        $nama = $req->query("nama") ?? '';
+        $user_id = $req->query("user_id");
+        $skip = ($currentPage - 1) * $limit;
+
+        $user = Auth::guard("user_login")->user();
+
+
+        if ($user->role === 'admin') {
+            $applications = Lamaran::with(["matkul", "matkul.prodi", 'matkul.prodi.fakultas', "user_login", 'user_login.pribadi'])->whereHas("user_login", function ($q) use ($nama) {
+                $q->whereHas("pribadi", function ($q) use ($nama) {
+                    $q->where("nama_lengkap", 'ILIKE', '%' . $nama . '%');
+                }); 
+            });
+            $count = $applications->count();
+            return response()->json([
+                "data" => $applications->skip($skip)->take($limit)->get(),
+                "totalPage" => ceil($count / $limit)
+            ]);
+        }
+        if ($user_id && $user->id == $user_id) {
+            $applications = Lamaran::with(["matkul", "matkul.prodi", 'matkul.prodi.fakultas', "user_login", 'user_login.pribadi'])->whereHas("user_login", function ($q) use ($nama) {
+                $q->whereHas("pribadi", function ($q) use ($nama) {
+                    $q->where("nama_lengkap", 'ILIKE', '%' . $nama . '%');
+                });
+            })->where("user_id", $user_id);
+            $count = $applications->count();
+            return response()->json([
+                "data" => $applications->skip($skip)->take($limit)->get(),
+                "totalPage" => ceil($count / $limit)
+            ]);
+        }
+        return response()->json([
+            "data" => [],
+            "totalPage" => ceil(0 / $limit)
+        ]);
+    }
 }

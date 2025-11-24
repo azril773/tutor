@@ -1,11 +1,5 @@
-import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import PaginationStateful from '@/components/custom/pagination-stateful';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,210 +15,135 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { GetTutors } from '@/pages/_api/tutor';
+import EmptyState from '@/pages/auth/components/empty-state';
 import { User } from '@/types';
-import { Form, router } from '@inertiajs/react';
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    SortingState,
-    useReactTable,
-    VisibilityState,
-} from '@tanstack/react-table';
+import { router, usePage } from '@inertiajs/react';
 import { MoreHorizontal } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export default function TableTutor({
-    data,
-    role,
-}: {
-    data: Array<User>;
-    role: string;
-}) {
-    console.log(data)
-    const approveRef = useRef<HTMLButtonElement | null>(null);
-    const [open, setIsOpen] = useState<boolean>(false);
-    const [selectedId, setSelectedId] = useState<number | null>(null);
-    const columns: ColumnDef<User>[] = [
-        {
-            id: 'nama',
-            header: 'Nama Tutor',
-            cell: ({ row }) => <>{row.original.pribadi.nama_lengkap}</>,
-            filterFn: (row, id, value) => {
-                return row.original.pribadi.nama_lengkap
-                    .toLowerCase()
-                    .includes(value.toLowerCase());
-            },
-        },
-        {
-            id: 'NIk',
-            header: 'NIK',
-            cell: ({ row }) => {
-                return <>{row.original.pribadi.nik}</>;
-            },
-        },
-        {
-            id: 'JK',
-            header: 'Jenis Kelamin',
-            cell: ({ row }) => <>{row.original.pribadi.jk}</>,
-        },
-        {
-            id: 'tgl_lahir',
-            header: 'Tanggal Lahir',
-            cell: ({ row }) => <>{row.original.pribadi.tgl_lahir ?? '-'}</>,
-        },
-        {
-            id: 'action',
-            enableHiding: false,
-            cell: ({ row }) => {
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    router.visit(
-                                        `/dashboard/tutor/${row.original.id}`,
-                                    )
-                                }
-                            >
-                                Detail
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                );
-            },
-        },
-    ];
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        {},
-    );
-    const [rowSelection, setRowSelection] = useState({});
-    const table = useReactTable({
-        data,
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
-    });
+export default function TableTutor({ role }: { role: string }) {
+    const props = usePage().props;
+    const [data, setData] = useState<Array<User>>([]);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPage, setTotalPage] = useState<number>(1);
+    const [nama, setNama] = useState<string>('');
+
+    const [error, setError] = useState<string>('');
+
+    const loadData = async () => {
+        const { data, totalPage, error } = await GetTutors({
+            csrf_token: props.csrf_token,
+            currentPage,
+            nama,
+        });
+        console.log(data)
+        if (error.length > 0) {
+            setError(error);
+            setData([]);
+        } else {
+            setData(data);
+            setTotalPage(totalPage);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [currentPage]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            loadData();
+        }, 300);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [nama]);
+
 
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Cari berdasarkan nama"
-                    value={
-                        (table.getColumn('nama')?.getFilterValue() as string) ??
-                        ''
-                    }
-                    onChange={(event) =>
-                        table
-                            .getColumn('nama')
-                            ?.setFilterValue(event.target.value)
-                    }
+                    value={nama}
+                    onChange={(value) => setNama(value.currentTarget.value)}
                     className="max-w-sm"
                 />
             </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
+                        <TableRow>
+                            <TableHead>NIK</TableHead>
+                            <TableHead>Nama</TableHead>
+                            <TableHead>Jenis Kelamin</TableHead>
+                            <TableHead>Tanggal Lahir</TableHead>
+                        </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && 'selected'
-                                    }
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
+                        {data.length <= 0 ? (
+                            <EmptyState colspan={4}/>
                         ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
+                            <>
+                                {data.map((tutor, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>
+                                            {tutor.pribadi?.nik ?? '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {tutor.pribadi?.nama_lengkap ?? '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {tutor.pribadi?.jk ?? '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {tutor.pribadi?.tgl_lahir.toString() ?? '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="h-8 w-8 p-0"
+                                                    >
+                                                        <span className="sr-only">
+                                                            Open menu
+                                                        </span>
+                                                        <MoreHorizontal />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() =>
+                                                            router.visit(
+                                                                `/dashboard/tutor/${tutor.id}`,
+                                                            )
+                                                        }
+                                                    >
+                                                        Detail
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
                         )}
                     </TableBody>
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
                 <div className="space-x-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        Next
-                    </Button>
+                    <PaginationStateful
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        totalPages={totalPage}
+                    />
                 </div>
             </div>
-            <Dialog open={open} onOpenChange={(value) => setIsOpen(value)}>
+            {/* <Dialog open={open} onOpenChange={(value) => setIsOpen(value)}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
@@ -251,7 +170,7 @@ export default function TableTutor({
                         </div>
                     </DialogHeader>
                 </DialogContent>
-            </Dialog>
+            </Dialog> */}
         </div>
     );
 }

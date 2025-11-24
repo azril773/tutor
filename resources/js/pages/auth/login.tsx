@@ -1,15 +1,11 @@
-import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import login from '@/actions/App/Http/Controllers/CustomAuth/login';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
-import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 interface LoginProps {
@@ -17,18 +13,21 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login() {
+    const { flash } = usePage().props;
     return (
         <AuthLayout
             title="Selamat Datang"
             description="Masukan username dan password anda."
         >
             <Head title="Log in" />
-
-            <Form
-                {...login.LoginProses.form()}
-                className="flex flex-col gap-6"
-            >
+            {flash.error && (
+                <>
+                    <br />
+                    <span className="text-sm text-red-500">{flash.error}</span>
+                </>
+            )}
+            <Form {...login.LoginProses.form()} className="flex flex-col gap-6">
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
@@ -85,7 +84,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </>
                 )}
             </Form>
-
         </AuthLayout>
     );
 }

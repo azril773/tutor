@@ -14,12 +14,15 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+
+use function PHPUnit\Framework\isEmpty;
+
 class registrasi extends Controller
 {
     //
 
     public function registrasi_user(Request $req)
-    {   
+    {
 
         $validate = $req->validate([
             "namaLengkap" => "required|string",
@@ -32,33 +35,37 @@ class registrasi extends Controller
         $email = $req->email;
         $jk = $req->jk;
         $nik = $req->nik;
-
-
+        
+        
         DB::beginTransaction();
         try {
+            $pribadiExist = Pribadi::where("email", $email)->exists();
+            if ($pribadiExist) {
+                Session::flash("error", "Email already exist");
+                DB::rollBack();
+                return redirect()->intended("/registrasi");
+            };
             $user = new UserLogin();
             $user->email = $email;
             $password = Str::random(6);
             $user->password = Hash::make($password);
             $user->save();
 
+
             $dataPribadi = new Pribadi();
-            Log::debug("OKOKO".$namaLengkap);
             $dataPribadi->nama_lengkap = $namaLengkap;
             $dataPribadi->email = $email;
             $dataPribadi->jk = $jk;
             $dataPribadi->nik = $nik;
             $dataPribadi->user_id = $user->id;
             $dataPribadi->save();
-            Log::debug("OKOKO");
 
             Mail::to($email)->send(new SendUser($user->username, $password));
-            DB::commit();            
+            DB::commit();
             return redirect()->intended("/login");
         } catch (Exception $err) {
-            Session::flash("error","Gagal registrasi");
-            DB::rollBack();            
+            Session::flash("error", "Gagal registrasi");
+            DB::rollBack();
         }
-
     }
 }
