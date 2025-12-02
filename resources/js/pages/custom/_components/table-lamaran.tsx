@@ -44,7 +44,8 @@ export default function TableLamaran({
     const [totalPage, setTotalPage] = useState<number>(1);
     const [nama, setNama] = useState<string>('');
 
-    const [open, setOpen] = useState<boolean>(false);
+    const [approveOpen, setApproveOpen] = useState<boolean>(false);
+    const [rejectOpen, setRejectOpen] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
     const loadData = async () => {
@@ -120,6 +121,12 @@ export default function TableLamaran({
                                         <Badge variant={'secondary'}>
                                             {dt.status}
                                         </Badge>
+                                    ) : dt.status === 'REJECTED' ? (
+                                        <Badge
+                                            variant="destructive"
+                                        >
+                                            {dt.status}
+                                        </Badge>
                                     ) : (
                                         <Badge
                                             variant="secondary"
@@ -129,7 +136,7 @@ export default function TableLamaran({
                                         </Badge>
                                     )}
                                 </TableCell>
-                                {role === 'admin' && (
+                                {role === 'admin' && dt.status === "PENDING" && (
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -146,13 +153,23 @@ export default function TableLamaran({
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem
                                                     onClick={() => {
-                                                        setOpen(true);
+                                                        setApproveOpen(true);
                                                         setSelectedId(
                                                             dt.id.toString(),
                                                         );
                                                     }}
                                                 >
                                                     Approve
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={() => {
+                                                        setRejectOpen(true);
+                                                        setSelectedId(
+                                                            dt.id.toString(),
+                                                        );
+                                                    }}
+                                                >
+                                                    Reject
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -172,7 +189,7 @@ export default function TableLamaran({
                     />
                 </div>
             </div>
-            <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
+            <Dialog open={approveOpen} onOpenChange={(value) => setApproveOpen(value)}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
@@ -190,10 +207,38 @@ export default function TableLamaran({
                                     type="submit"
                                     className="cursor-pointer"
                                     onClick={() => {
-                                        setOpen(false);
+                                        setApproveOpen(false);
                                     }}
                                 >
                                     Approve
+                                </Button>
+                            </Form>
+                        </div>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={rejectOpen} onOpenChange={(value) => setRejectOpen(value)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
+                        <div className="mt-2 flex justify-end">
+                            <Form
+                                {...DashboardController.rejectLamaran.form()}
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value={selectedId}
+                                />
+                                <Button variant={'destructive'}
+                                    type="submit"
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        setRejectOpen(false);
+                                    }}
+                                >
+                                    Reject
                                 </Button>
                             </Form>
                         </div>

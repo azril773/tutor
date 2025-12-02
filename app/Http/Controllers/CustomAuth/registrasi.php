@@ -60,10 +60,12 @@ class registrasi extends Controller
             $dataPribadi->user_id = $user->id;
             $dataPribadi->save();
 
-            Mail::to($email)->send(new SendUser($user->email, $password));
+            Mail::to($email)->send(new SendUser($namaLengkap, $email, $password));
             DB::commit();
-            return redirect()->intended("/login");
+            Session::flash("success","Berhasil login. Silahkan cek email anda.");
+            return redirect()->intended("/");
         } catch (Exception $err) {
+            Log::debug($err);
             Session::flash("error", "Gagal registrasi");
             DB::rollBack();
         }

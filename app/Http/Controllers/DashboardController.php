@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\approve;
+use App\Mail\reject;
 use App\Mail\SendUser;
 use App\Models\Dokumen;
 use App\Models\Fakultas;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -134,12 +137,37 @@ class DashboardController extends Controller
 
         $id = $req->id;
 
-        $lamaran = Lamaran::findOrFail($id);
+        $lamaran = Lamaran::with("user_login","user_login.pribadi")->findOrFail($id);
         Log::debug($lamaran);
         $lamaran->update([
             "status" => "APPROVED"
         ]);
+        Mail::to($lamaran->user_login->email)->send(new approve($lamaran->user_login->pribadi->nama_lengkap));
         Session::flash("success", 'Berhasil approve lamaran');
+        return redirect()->intended("/dashboard");
+    }
+
+    public function rejectLamaran(Request $req)
+    {
+        $validated = $req->validate([
+            "id" => "required|string"
+        ]);
+        $user = Auth::guard("user_login")->user();
+        if (!$user->role === "admin") {
+            return redirect()->intended("/dashboard")->withErrors([
+                "roleError" => "Anda bukan admin."
+            ]);
+        };
+
+        $id = $req->id;
+
+        $lamaran = Lamaran::with("user_login","user_login.pribadi")->findOrFail($id);
+        Log::debug($lamaran);
+        $lamaran->update([
+            "status" => "REJECTED"
+        ]);
+        Mail::to($lamaran->user_login->email)->send(new reject($lamaran->user_login->pribadi->nama_lengkap));
+        Session::flash("success", 'Berhasil reject lamaran');
         return redirect()->intended("/dashboard");
     }
 

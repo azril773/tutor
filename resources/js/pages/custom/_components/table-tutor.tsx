@@ -100,7 +100,7 @@ export default function TableTutor({ role }: { role: string }) {
                                             {tutor.pribadi?.jk ?? '-'}
                                         </TableCell>
                                         <TableCell>
-                                            {tutor.pribadi?.tgl_lahir.toString() ?? '-'}
+                                            {tutor.pribadi?.tgl_lahir ? tutor.pribadi?.tgl_lahir.toString() : '-'}
                                         </TableCell>
                                         <TableCell>
                                             <DropdownMenu>

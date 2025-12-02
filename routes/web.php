@@ -28,6 +28,7 @@ Route::post("user_login", [login::class, "LoginProses"]);
 
 Route::middleware(['customAuth','adminAuth'])->group(function () {
     Route::post('approve', [DashboardController::class, 'approveLamaran'])->name('approveLamaran');
+    Route::post('reject', [DashboardController::class, 'rejectLamaran'])->name('rejectLamaran');
     Route::get("master-data", [DashboardController::class, "masterData"])->name("masterDataPage");
     Route::get("master-fakultas", [DashboardController::class, "masterFakultas"])->name("masterFakultasPage");
     Route::get("master-prodi", [DashboardController::class, "masterProdi"])->name("masterProdiPage");

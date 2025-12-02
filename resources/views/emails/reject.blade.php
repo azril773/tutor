@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pemberitahuan Lolos Seleksi</title>
+    <title>Pemberitahuan Tidak Lolos Seleksi</title>
     <style>
         body {
             font-family: Arial, sans-serif !important;
@@ -21,7 +21,7 @@
             overflow: hidden !important;
         }
         .header {
-            background-color: #28a745 !important; 
+            background-color: #dc3545 !important; 
             color: #ffffff !important;
             padding: 20px !important;
             text-align: center !important;
@@ -62,7 +62,7 @@
         }
         .highlight {
             font-weight: bold !important;
-            color: #28a745 !important;
+            color: #dc3545 !important; 
         }
         
         blockquote, .gmail_quote, .yahoo_quoted, .outlook_quote {
@@ -78,14 +78,14 @@
     <div class="container">
         <div class="header">
             <img src="{{ $logoUrl }}" alt="Logo UIN Siber Syekh Nurjati Cirebon">
-            <h1>Selamat! Anda Lolos Seleksi Tutor Online</h1>
+            <h1>Maaf, Anda Tidak Lolos Seleksi Tutor Online</h1>
         </div>
         <div class="content">
             <p>Yth. {{ $namaLengkap }},</p>
             <p>Assalamu’alaikum Wr. Wb.</p>
-            <p>Dengan ini kami sampaikan kabar gembira bahwa Anda telah <span style="color: #28a745; font-weight: bold;">lolos</span> seleksi sebagai Tutor Online pada Program Studi Pendidikan Jarak Jauh (PJJ) UPT PJJ UIN Siber Syekh Nurjati Cirebon. Kami sangat mengapresiasi minat dan komitmen Anda untuk berpartisipasi dalam program ini.</p>
-            <p>Selanjutnya, sebagai dedikasi terjalinnya informasi yang konsisten. Pihak panitia seleksi akan mengundang nomor WhatsApp yang anda daftarkan ke dalam grup khusus Tutor.</p>
-            <p>Terima kasih atas partisipasi dan antusiasme Anda dalam mengikuti seleksi ini. Kami menantikan kerjasama yang baik dari Anda.</p>
+            <p>Dengan ini kami sampaikan bahwa setelah melalui proses seleksi, Anda <span style="color: #dc3545; font-weight: bold;">belum lolos</span> sebagai Tutor Online pada Program Studi Pendidikan Jarak Jauh (PJJ) UPT PJJ UIN Siber Syekh Nurjati Cirebon. Kami mengapresiasi minat dan komitmen Anda untuk berpartisipasi dalam program ini.</p>
+            <p>Meskipun demikian, kami mendorong Anda untuk terus mengembangkan diri dan mencoba kesempatan lain di masa depan. Jika ada pertanyaan, silakan hubungi kami.</p>
+            <p>Terima kasih atas partisipasi dan antusiasme Anda dalam mengikuti seleksi ini. Kami berharap dapat bekerja sama di lain waktu.</p>
             <p>Wassalamu’alaikum Wr. Wb.</p>
         </div>
         <div class="footer">

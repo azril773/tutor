@@ -8,23 +8,18 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class SendUser extends Mailable
+class reject extends Mailable
 {
     use Queueable, SerializesModels;
-    public $name;
-    public $email;
-    public $password;
+    public $namaLengkap;
     public $logoUrl;
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $email, $password)
-    {
-        $this->name = $name;
-        $this->email = $email;
-        $this->password = $password;
+    public function __construct($namaLengkap)
+    {   
+        $this->namaLengkap = $namaLengkap;
         $this->logoUrl = 'https://i.ibb.co.com/rR6qw0Hj/Group-3-1.png';
     }
 
@@ -34,7 +29,7 @@ class SendUser extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Registrasi Berhasil',
+            subject: 'Reject',
         );
     }
 
@@ -44,7 +39,7 @@ class SendUser extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.registrasi',
+            view: 'emails.reject',
         );
     }
 

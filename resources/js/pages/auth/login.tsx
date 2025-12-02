@@ -21,6 +21,9 @@ export default function Login() {
             description="Masukan username dan password anda."
         >
             <Head title="Log in" />
+            {flash.success && (
+                <span className="text-sm text-green-500">{flash.success}</span>
+            )}
             {flash.error && (
                 <>
                     <br />
