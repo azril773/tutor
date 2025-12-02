@@ -27,20 +27,32 @@ export default function Registrasi() {
                     <nav className="flex items-center justify-end gap-4">
                         <>
                             <Link
-                                href={'/login'}
+                                href={'/'}
                                 className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                             >
                                 Login
-                            </Link>
-                            {' '}
+                            </Link>{' '}
                         </>
                     </nav>
                 </header>
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
-                    <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
-                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
+                    <main className="flex w-[800px] flex-col-reverse lg:max-w-4xl lg:flex-row">
+                        <div className="flex-1 rounded-br-lg rounded-bl-lg bg- p-6 pb-12 leading-[20px] lg:rounded-tl-lg lg:rounded-br-none  dark:text-[#EDEDEC] ">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="mb-1 flex items-center justify-center rounded-md">
+                                    <img src="/logouin2.png" alt="logo uin" />
+                                </div>
+                                <div className="space-y-2 text-center">
+                                    <h1 className="text-xl font-medium">
+                                        Registrasi Tutor
+                                    </h1>
+                                    <p className="text-center text-sm text-muted-foreground">
+                                        Silahkan masukan data yang ada di bawah.
+                                    </p>
+                                </div>
+                            </div>
                             {flash.error && (
-                                <div className='my-1'>
+                                <div className="my-1">
                                     <br />
                                     <span className="text-sm text-red-500">
                                         {flash.error}
@@ -87,7 +99,7 @@ export default function Registrasi() {
                                             {/* {error['email'] ?? ''} */}
                                         </span>
                                     </div>
-                                    <div className="grid w-full gap-2">
+                                    <div className="space-y-2">
                                         <Label>NIK</Label>
                                         <NumericFormat
                                             defaultValue={nik}
@@ -104,7 +116,7 @@ export default function Registrasi() {
                                             {/* {error['nik'] ?? ''} */}
                                         </span>
                                     </div>
-                                    <div className="grid w-full justify-end gap-4">
+                                    <div className="space-y-2">
                                         <Label>Jenis Kelamin</Label>
                                         <Select
                                             name="jk"
@@ -113,7 +125,7 @@ export default function Registrasi() {
                                                 setJk(value)
                                             }
                                         >
-                                            <SelectTrigger className="w-[300px]">
+                                            <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Jenis Kelamin" />
                                             </SelectTrigger>
                                             <SelectContent>

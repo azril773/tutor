@@ -29,7 +29,7 @@ class reject extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reject',
+            subject: 'Status Lamaran',
         );
     }
 
