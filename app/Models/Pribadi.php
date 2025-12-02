@@ -16,6 +16,8 @@ class Pribadi extends Model
         "nip",
         "nik",
         "nidn",
+        "nuptk",
+        "npwp",
         "alamat",
         "provinsi",
         "kabkot",

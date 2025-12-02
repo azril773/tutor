@@ -291,27 +291,6 @@ export default function Show({
     })
   }
 
-//   const handleEdit = () => {
-//     if (urls.edit) {
-//       router.visit(urls.edit)
-//     }
-//   }
-
-//   const handleBack = () => {
-//     if (urls.back) {
-//       router.visit(urls.back)
-//     }
-//   }
-
-//   const handlePrint = () => {
-//     window.print()
-//   }
-
-//   const handleExport = () => {
-//     if (urls.exportPdf) {
-//       window.location.href = urls.exportPdf
-//     }
-//   }
 
   const fullName = user.pribadi?.nama_lengkap || "Pengguna"
   const initials = getInitials(fullName)
@@ -449,6 +428,10 @@ export default function Show({
                             <p className="text-xs font-medium text-muted-foreground">NPWP</p>
                             <p className="text-sm">{user.pribadi?.npwp || "—"}</p>
                           </div>
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground">NUPTK</p>
+                            <p className="text-sm">{user.pribadi?.nuptk || "—"}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -477,7 +460,7 @@ export default function Show({
                         </div>
                         <div>
                           <p className="text-xs font-medium text-muted-foreground">Pangkat</p>
-                          <p className="text-sm">{user.institusi.pangkat || "—"}</p>
+                          <p className="text-sm">{user.institusi.golongan || "—"}</p>
                         </div>
                         <div className="sm:col-span-2">
                           <p className="text-xs font-medium text-muted-foreground">Bidang Pekerjaan</p>

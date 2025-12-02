@@ -20,7 +20,7 @@ export default function ResetPassword() {
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title="Apply Lamaran" />
+                <Head title="Reset Password" />
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                         {Object.values(errors).map((value) => (
                         <span className="text-sm text-red-500">{value}</span>

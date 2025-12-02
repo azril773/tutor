@@ -60,7 +60,7 @@ class registrasi extends Controller
             $dataPribadi->user_id = $user->id;
             $dataPribadi->save();
 
-            Mail::to($email)->send(new SendUser($user->username, $password));
+            Mail::to($email)->send(new SendUser($user->email, $password));
             DB::commit();
             return redirect()->intended("/login");
         } catch (Exception $err) {

@@ -6,7 +6,10 @@ export default function InputComponent({
 }: React.ComponentProps<'input'>) {
     return (
         <div className="grid gap-2">
-            <Label htmlFor={props.id}>{props.title}</Label>
+            <Label htmlFor={props.id}>
+                {props.title}{' '}
+                {props.required && <span className="text-red-500">*</span>}
+            </Label>
             <Input {...props} />
         </div>
     );

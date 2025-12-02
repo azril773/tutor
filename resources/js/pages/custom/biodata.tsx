@@ -4,6 +4,7 @@ import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import {
     BreadcrumbItem,
+    Dokumen as DokumenType,
     Institusi,
     Pendidikan,
     PendidikanPayload,
@@ -12,6 +13,7 @@ import {
 import { usePage } from '@inertiajs/react';
 import { FileText, Landmark, University, Users } from 'lucide-react';
 import { useState } from 'react';
+import { updateBiodata } from '../_api/biodata';
 import DataInstitusi from '../auth/components/data-institusi';
 import DataPendidikan from '../auth/components/data-pendidikan';
 import DataPribadi from '../auth/components/data-pribadi';
@@ -22,11 +24,13 @@ export default function Biodata({
     dataPribadi,
     dataInstitusi,
     dataPendidikan,
+    dokumen
 }: {
     idUser: string;
     dataPribadi: Pribadi | null;
     dataInstitusi?: Institusi;
     dataPendidikan: Pendidikan[];
+    dokumen?: DokumenType
 }) {
     const page = usePage();
     const arrayMenu: string[] = [
@@ -52,14 +56,22 @@ export default function Biodata({
     const [nowa, setNowa] = useState<string>(dataPribadi?.nowa ?? '');
     const [nip, setNip] = useState<string>(dataPribadi?.nip ?? '');
     const [nik, setNik] = useState<string>(dataPribadi?.nik ?? '');
+    const [nuptk, setNuptk] = useState<string>(dataPribadi?.nuptk ?? '');
+    const [npwp, setNpwp] = useState<string>(dataPribadi?.npwp ?? '');
     const [nidn, setNidn] = useState<string>(dataPribadi?.nidn ?? '');
-    const [provinsi, setProvinsi] = useState<string>(dataPribadi?.provinsi ?? '');
+    const [provinsi, setProvinsi] = useState<string>(
+        dataPribadi?.provinsi ?? '',
+    );
     const [kabkot, setKabkot] = useState<string>(dataPribadi?.kabkot ?? '');
     const [kodePos, setKodePos] = useState<string>(dataPribadi?.kodepos ?? '');
     const [alamat, setAlamat] = useState<string>(dataPribadi?.alamat ?? '');
     const [norek, setNorek] = useState<string>(dataPribadi?.norek ?? '');
-    const [atasNama, setAtasNama] = useState<string>(dataPribadi?.atas_nama ?? '');
-    const [namaBank, setNamaBank] = useState<string>(dataPribadi?.nama_bank ?? '');
+    const [atasNama, setAtasNama] = useState<string>(
+        dataPribadi?.atas_nama ?? '',
+    );
+    const [namaBank, setNamaBank] = useState<string>(
+        dataPribadi?.nama_bank ?? '',
+    );
 
     // data institusi
     const [institusi, setInstitusi] = useState<string>(
@@ -71,8 +83,8 @@ export default function Biodata({
     const [masaKerja, setMasaKerja] = useState<string>(
         dataInstitusi?.masa_kerja ?? '',
     );
-    const [pangkat, setPangkat] = useState<string>(
-        dataInstitusi?.pangkat ?? '',
+    const [golongan, setGolongan] = useState<string>(
+        dataInstitusi?.golongan ?? '',
     );
     const [bidangPekerjaan, setBidangPekerjaan] = useState<string>(
         dataInstitusi?.bidang_pekerjaan ?? '',
@@ -144,6 +156,8 @@ export default function Biodata({
         if (nip.length <= 0) tempError['nip'] = 'Form ini harus diisi.';
         if (nik.length <= 0) tempError['nik'] = 'Form ini harus diisi.';
         if (nidn.length <= 0) tempError['nidn'] = 'Form ini harus diisi.';
+        if (nuptk.length <= 0) tempError['nuptk'] = 'Form ini harus diisi.';
+        if (npwp.length <= 0) tempError['npwp'] = 'Form ini harus diisi.';
         if (provinsi.length <= 0)
             tempError['provinsi'] = 'Form ini harus diisi.';
         if (kabkot.length <= 0) tempError['kabkot'] = 'Form ini harus diisi.';
@@ -155,8 +169,8 @@ export default function Biodata({
         if (namaBank.length <= 0)
             tempError['namaBank'] = 'Form ini harus diisi.';
 
-        console.log("OKOKOk")
-        setError(tempError);    
+        console.log('OKOKOk');
+        setError(tempError);
         return Object.keys(tempError).length === 0;
     };
 
@@ -168,7 +182,7 @@ export default function Biodata({
             tempError['statusPekerjaan'] = 'Form ini harus diisi.';
         if (masaKerja.length <= 0)
             tempError['masaKerja'] = 'Form ini harus diisi.';
-        if (pangkat.length <= 0) tempError['pangkat'] = 'Form ini harus diisi.';
+        if (golongan.length <= 0) tempError['golongan'] = 'Form ini harus diisi.';
         if (bidangPekerjaan.length <= 0)
             tempError['bidangPekerjaan'] = 'Form ini harus diisi.';
         setError(tempError);
@@ -227,6 +241,8 @@ export default function Biodata({
         formData.append('nip', nip);
         formData.append('nik', nik);
         formData.append('nidn', nidn);
+        formData.append('nuptk', nuptk);
+        formData.append('npwp', npwp);
         formData.append('provinsi', provinsi);
         formData.append('kabkot', kabkot);
         formData.append('kodePos', kodePos);
@@ -237,40 +253,28 @@ export default function Biodata({
         formData.append('institusi', institusi);
         formData.append('statusPekerjaan', statusPekerjaan);
         formData.append('masaKerja', masaKerja);
-        formData.append('pangkat', pangkat);
+        formData.append('golongan', golongan);
         formData.append('bidangPekerjaan', bidangPekerjaan);
         formData.append('pendidikan', JSON.stringify(pendidikan));
-        formData.append('cv', cv as Blob);
-        formData.append('ijazah', ijazah as Blob);
-        formData.append('rps', rps as Blob);
-        formData.append('fotoKtp', fotoKtp as Blob);
-        formData.append('bukuTabungan', bukuTabungan as Blob);
-        formData.append('suratKetersediaan', suratKetersediaan as Blob);
-        const response = await fetch('/biodata', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': page.props.csrf_token,
-            },
-            body: formData,
+        formData.append('cv', cv as Blob ?? '');
+        formData.append('ijazah', ijazah as Blob ?? '');
+        formData.append('rps', rps as Blob ?? '');
+        formData.append('fotoKtp', fotoKtp as Blob ?? '');
+        formData.append('bukuTabungan', bukuTabungan as Blob ?? '');
+        formData.append('suratKetersediaan', suratKetersediaan as Blob ?? '');
+
+        const { data, message, error } = await updateBiodata({
+            formData,
+            csrf_token: page.props.csrf_token,
         });
-        if (!response.ok) {
-            setLoading(false);
-            const jsonResponse: { errors: { [key: string]: string[] } } =
-                await response.json();
-            if (
-                jsonResponse.errors &&
-                Object.keys(jsonResponse.errors).length > 0
-            ) {
-                setErrors({ error: ['File harus bertipe docx atau pdf'] });
-                return false;
-            } else {
-                console.log(response);
-                alert('Terjadi Kesalahan');
-            }
+        if (error === 'true') {
+            setLoading(false)
+            alert(message)
+        }else{
+            alert(message)
+            window.location.href = '/biodata'
         }
-        setLoading(false);
-        window.location.href = '/biodata';
+
     };
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -342,6 +346,11 @@ export default function Biodata({
                 {Object.values(errors).map((value) => (
                     <span className="text-sm text-red-500">{value}</span>
                 ))}
+                {page.props.flash.error && (
+                    <span className="text-sm text-red-500">
+                        {page.props.flash.error}
+                    </span>
+                )}
                 {page.props.flash.success && (
                     <span className="text-sm text-green-500">
                         {page.props.flash.success}
@@ -367,6 +376,10 @@ export default function Biodata({
                             setNik={setNik}
                             nidn={nidn}
                             setNidn={setNidn}
+                            nuptk={nuptk}
+                            setNuptk={setNuptk}
+                            npwp={npwp}
+                            setNpwp={setNpwp}
                             provinsi={provinsi}
                             setProvinsi={setProvinsi}
                             kabkot={kabkot}
@@ -397,8 +410,8 @@ export default function Biodata({
                             setStatusPekerjaan={setStatusPekerjaan}
                             masaKerja={masaKerja}
                             setMasaKerja={setMasaKerja}
-                            pangkat={pangkat}
-                            setPangkat={setPangkat}
+                            golongan={golongan}
+                            setGolongan={setGolongan}
                             bidangPekerjaan={bidangPekerjaan}
                             setBidangPekerjaan={setBidangPekerjaan}
                             error={error}
@@ -432,6 +445,7 @@ export default function Biodata({
                             suratKetersediaan={suratKetersediaan}
                             setSuratKetersediaan={setSuratKetersediaan}
                             error={error}
+                            dokumen={dokumen}
                         />
                     </section>
                 </section>

@@ -37,8 +37,8 @@ export default function TableTutor({ role }: { role: string }) {
             currentPage,
             nama,
         });
-        console.log(data)
         if (error.length > 0) {
+            alert("Terjadi kesalahan saat get data tutor")
             setError(error);
             setData([]);
         } else {
@@ -53,6 +53,7 @@ export default function TableTutor({ role }: { role: string }) {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
+            setCurrentPage(1)
             loadData();
         }, 300);
 

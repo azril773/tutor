@@ -20,7 +20,7 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
-    groups: string[]
+    groups: string[];
 }
 
 export interface SharedData {
@@ -31,39 +31,39 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
-
 export type Pribadi = {
-    id: number
-    nama_lengkap: string
-    email: string
-    nowa: string
-    jk: string
-    tgl_lahir: Date
-    nip: string
-    nik: string
-    nidn: string
-    alamat: string
-    provinsi: string
-    kabkot: string
-    kodepos: string
-    norek: string
-    atas_nama: string
-    nama_bank: string
-    npwp: string
-}
+    id: number;
+    nama_lengkap: string;
+    email: string;
+    nowa: string;
+    jk: string;
+    tgl_lahir: Date;
+    nip: string;
+    nik: string;
+    nuptk: string;
+    npwp: string;
+    golongan: string;
+    nidn: string;
+    alamat: string;
+    provinsi: string;
+    kabkot: string;
+    kodepos: string;
+    norek: string;
+    atas_nama: string;
+    nama_bank: string;
+};
 
 export type Institusi = {
-    id: number
-    institusi: string
-    status_pekerjaan: string
-    masa_kerja: string
-    pangkat: string
-    bidang_pekerjaan: string
-}
-
+    id: number;
+    institusi: string;
+    status_pekerjaan: string;
+    masa_kerja: string;
+    golongan: string;
+    bidang_pekerjaan: string;
+};
 
 export type Pendidikan = {
-    id: number
+    id: number;
     perguruan_tinggi: string;
     jenjang: string;
     bidang_studi: string;
@@ -79,26 +79,26 @@ export type PendidikanPayload = {
     tahun_lulus: string;
     gelar_depan: string;
     gelar_belakang: string;
-}
+};
 
 export type Dokumen = {
-    id: number
-    cv: string
-    ijazah: string
-    rps: string
-    foto_ktp: string
-    buku_tabungan: string
-    surat_ketersediaan: string
-}
+    id: number;
+    cv: string;
+    ijazah: string;
+    rps: string;
+    foto_ktp: string;
+    buku_tabungan: string;
+    surat_ketersediaan: string;
+};
 
 export type User = {
     id: number;
     email: string;
     password: string;
-    pribadi: Pribadi
-    institusi: Institusi
-    pendidikan: Pendidikan[]
-    dokumen: Dokumen
+    pribadi: Pribadi;
+    institusi: Institusi;
+    pendidikan: Pendidikan[];
+    dokumen: Dokumen;
 };
 
 export type Fakultas = {
@@ -123,13 +123,14 @@ export type Matkul = {
 
 export type LamaranType = {
     id: number;
-    status: string
+    status: string;
     user_id: number;
     matkul_id: number;
     user_login: User;
     matkul: Matkul;
 };
 
+export type ResponseApi = { data: string; message: string; error: string };
 
-export const BASEURL = "http://localhost:8000"
-export const DEFAULT_ERROR_MESSAGE = "Terjadi Kesalahan"
+export const BASEURL = 'http://localhost:8000';
+export const DEFAULT_ERROR_MESSAGE = 'Terjadi Kesalahan';

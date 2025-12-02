@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AdminCheck;
 use App\Http\Middleware\CustomAuth;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -23,7 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
         $middleware->alias([
-            "customAuth" => CustomAuth::class
+            "customAuth" => CustomAuth::class,
+            "adminAuth" => AdminCheck::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

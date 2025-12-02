@@ -76,6 +76,7 @@ export default function DataPendidikan({
                                     (pdk.perguruan_tinggi = value.target.value)
                                 }
                                 defaultValue={pdk.perguruan_tinggi}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.perguruan_tinggi ?? ''}
@@ -92,6 +93,7 @@ export default function DataPendidikan({
                                     (pdk.jenjang = value.target.value)
                                 }
                                 defaultValue={pdk.jenjang}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.jenjang ?? ''}
@@ -108,6 +110,7 @@ export default function DataPendidikan({
                                     (pdk.bidang_studi = value.target.value)
                                 }
                                 defaultValue={pdk.bidang_studi}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.bidang_studi ?? ''}
@@ -125,6 +128,7 @@ export default function DataPendidikan({
                                     (pdk.tahun_lulus = value.target.value)
                                 }
                                 defaultValue={pdk.tahun_lulus}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.tahun_lulus ?? ''}
@@ -141,6 +145,7 @@ export default function DataPendidikan({
                                     (pdk.gelar_depan = value.target.value)
                                 }
                                 defaultValue={pdk.gelar_depan}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.gelar_depan ?? ''}
@@ -157,6 +162,7 @@ export default function DataPendidikan({
                                     (pdk.gelar_belakang = value.target.value)
                                 }
                                 defaultValue={pdk.gelar_belakang}
+                                required={true}
                             />
                             <span className="-mt-4 text-sm text-red-500">
                                 {pdkError[index]?.gelar_belakang ?? ''}

@@ -32,7 +32,7 @@ export default function Registrasi() {
                             >
                                 Login
                             </Link>
-                            s{' '}
+                            {' '}
                         </>
                     </nav>
                 </header>

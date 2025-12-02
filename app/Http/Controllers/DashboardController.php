@@ -12,6 +12,7 @@ use App\Models\Pendidikan;
 use App\Models\Pribadi;
 use App\Models\Prodi;
 use App\Models\UserLogin;
+use Error;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Termwind\render;
 
@@ -31,14 +33,14 @@ class DashboardController extends Controller
     {
         $fakultas = Fakultas::all();
         $prodi = Prodi::with("fakultas")->get();
-        $maktul = Matkul::with("prodi")->get();
+        $matkul = Matkul::with("prodi")->get();
         $tutors = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->get();
         $user = Auth::guard("user_login")->user();
         $role = $user->role;
         return Inertia::render("custom/lamaran", [
             "fakultas" => $fakultas,
             "prodi" => $prodi,
-            "matkul" => $maktul,
+            "matkul" => $matkul,
             "role" => $role,
             "user_id" => $user->id,
             "tutors" => $tutors
@@ -52,12 +54,15 @@ class DashboardController extends Controller
         $pribadi = Pribadi::where("user_id", $user->id)->first();
         $institusi = Institusi::where("user_id", $user->id)->first();
         $pendidikan = Pendidikan::where("user_id", $user->id)->get();
+        $dokumen = Dokumen::where("user_id", $user->id)->first();
+        Log::debug($dokumen);
         return Inertia::render("custom/biodata", [
             "idUser" => $user->id,
             "role" => $role,
             "dataPribadi" => $pribadi,
             "dataInstitusi" => $institusi,
             "dataPendidikan" => $pendidikan,
+            "dokumen" => $dokumen,
         ]);
     }
 
@@ -130,6 +135,7 @@ class DashboardController extends Controller
         $id = $req->id;
 
         $lamaran = Lamaran::findOrFail($id);
+        Log::debug($lamaran);
         $lamaran->update([
             "status" => "APPROVED"
         ]);
@@ -175,17 +181,18 @@ class DashboardController extends Controller
     {
         $validated = $req->validate([
             "id" => "required|string",
-            'cv' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'ijazah' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'rps' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'foto_ktp' => 'mimes:jpg,jpeg,png,gif,webp',
-            'suratKetersediaan' => 'required|file|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'cv' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ijazah' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'rps' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'fotoKtp' => 'nullable|mimetypes:image/jpg,image/jpeg,image/png,gif,webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'suratKetersediaan' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ]);
         $id = $req->id;
         $user = UserLogin::where("id", $id)->first();
 
-        if (!$user) {
-            Session::flash("error", "User tidak ada");
+        if (!$user) { {
+                return response()->json("User tidak ada", 400);
+            }
         }
         // Data Pribadi
         $namaLengkap = $req->namaLengkap;
@@ -196,6 +203,8 @@ class DashboardController extends Controller
         $nip = $req->nip;
         $nik = $req->nik;
         $nidn = $req->nidn;
+        $nuptk = $req->nuptk;
+        $npwp = $req->npwp;
         $provinsi = $req->provinsi;
         $kabkot = $req->kabkot;
         $kodePos = $req->kodePos;
@@ -208,17 +217,17 @@ class DashboardController extends Controller
         $institusi = $req->institusi;
         $statusPekerjaan = $req->statusPekerjaan;
         $masaKerja = $req->masaKerja;
-        $pangkat = $req->pangkat;
+        $golongan = $req->golongan;
         $bidangPekerjaan = $req->bidangPekerjaan;
-
+        
         // Pendidikan
         $pendidikan = $req->pendidikan;
         $transformPendidikan = json_decode($pendidikan);
-
-
-
+        
+        
         DB::beginTransaction();
         try {
+            Log::debug($nuptk.' '.$npwp);
             Pribadi::updateOrCreate(
                 ["user_id" => $id],
                 [
@@ -230,6 +239,8 @@ class DashboardController extends Controller
                     "nip" => $nip,
                     "nik" => $nik,
                     "nidn" => $nidn,
+                    "nuptk" => $nuptk,
+                    "npwp" => $npwp,
                     "alamat" => $alamat,
                     "provinsi" => $provinsi,
                     "kabkot" => $kabkot,
@@ -237,17 +248,16 @@ class DashboardController extends Controller
                     "norek" => $norek,
                     "atas_nama" => $atasNama,
                     "nama_bank" => $namaBank,
-                ]
-            );
-            Log::debug("OKOKOK");
-
+                    ]
+                );
+                
             Institusi::updateOrCreate(
                 ["user_id" => $id],
                 [
                     "institusi" => $institusi,
                     "status_pekerjaan" => $statusPekerjaan,
                     "masa_kerja" => $masaKerja,
-                    "pangkat" => $pangkat,
+                    "golongan" => $golongan,
                     "bidang_pekerjaan" => $bidangPekerjaan,
                 ]
             );
@@ -260,43 +270,68 @@ class DashboardController extends Controller
             }
 
             Pendidikan::insert($dataPendidikan);
-            Log::debug($pendidikan);
             $dokumen = Dokumen::where("user_id", $id)->first();
-
-            if ($dokumen) {
-                Storage::disk("public")->delete($dokumen->cv);
-                Storage::disk("public")->delete($dokumen->ijazah);
-                Storage::disk("public")->delete($dokumen->rps);
-                Storage::disk("public")->delete($dokumen->foto_ktp);
-                Storage::disk("public")->delete($dokumen->buku_tabungan);
-                Storage::disk("public")->delete($dokumen->surat_ketersediaan);
+            if (empty($dokumen->cv) && empty($req->file("cv"))) {
+                return response()->json("Dokumen CV harus diisi", 400);
+            }
+            if (empty($dokumen->ijazah) && empty($req->file("ijazah"))) {
+                return response()->json("Dokumen Ijazah harus diisi", 400);
+            }
+            if (empty($dokumen->rps) && empty($req->file("rps"))) {
+                return response()->json("Dokumen RPS harus diisi", 400);
+            }
+            if (empty($dokumen->foto_ktp) && empty($req->file("fotoKtp"))) {
+                return response()->json("Dokumen Foto KTP harus diisi", 400);
+            }
+            if (empty($dokumen->buku_tabungan) && empty($req->file("bukuTabungan"))) {
+                return response()->json("Dokumen Buku Tabungan harus diisi", 400);
+            }
+            if (empty($dokumen->surat_ketersediaan) && empty($req->file("suratKetersediaan"))) {
+                return response()->json("Dokumen Surat Ketersediaan harus diisi", 400);
             }
 
-            $pathCv = $req->file("cv")->store("dokumen", 'public');
+            if ($dokumen) {
+                if (!empty($req->file("cv"))) Storage::disk("public")->delete($dokumen->cv);
+                if (!empty($req->file("ijazah"))) Storage::disk("public")->delete($dokumen->ijazah);
+                if (!empty($req->file("rps"))) Storage::disk("public")->delete($dokumen->rps);
+                if (!empty($req->file("fotoKtp"))) Storage::disk("public")->delete($dokumen->foto_ktp);
+                if (!empty($req->file("bukuTabungan"))) Storage::disk("public")->delete($dokumen->buku_tabungan);
+                if (!empty($req->file("suratKetersediaan"))) Storage::disk("public")->delete($dokumen->surat_ketersediaan);
+            }
 
-            $pathIjazah = $req->file("ijazah")->store("dokumen", 'public');
+            $pathCv = !empty($req->file("cv")) ? $req->file("cv")->store("dokumen", 'public') : '';
 
-            $pathRps = $req->file("rps")->store("dokumen", 'public');
+            $pathIjazah = !empty($req->file('ijazah')) ? $req->file("ijazah")->store("dokumen", 'public') : '';
 
-            $pathFotoKtp = $req->file("fotoKtp")->store("dokumen", 'public');
+            $pathRps = !empty($req->file("rps")) ? $req->file("rps")->store("dokumen", 'public') : '';
 
-            $pathBukuTabungan = $req->file("bukuTabungan")->store("dokumen", 'public');
+            $pathFotoKtp = !empty($req->file('fotoKtp')) ? $req->file("fotoKtp")->store("dokumen", 'public') : '';
 
-            $pathSuratKetersediaan = $req->file("suratKetersediaan")->store("dokumen", 'public');
-            Log::debug($pathFotoKtp);
+            $pathBukuTabungan = !empty($req->file("bukuTabungan")) ? $req->file("bukuTabungan")->store("dokumen", 'public') : '';
+
+            $pathSuratKetersediaan = !empty($req->file('suratKetersediaan')) ? $req->file("suratKetersediaan")->store("dokumen", 'public') : '';
+
+            $data = array_filter([
+                "cv" => $pathCv,
+                "ijazah" => $pathIjazah,
+                "rps" => $pathRps,
+                "foto_ktp" => $pathFotoKtp,
+                "buku_tabungan" => $pathBukuTabungan,
+                "surat_ketersediaan" => $pathSuratKetersediaan,
+            ], function ($v) {
+                return !empty($v);
+            });
+
             $dokumen = Dokumen::updateOrCreate(
                 ["user_id" => $id],
-                [
-                    "cv" => $pathCv,
-                    "ijazah" => $pathIjazah,
-                    "rps" => $pathRps,
-                    "foto_ktp" => $pathFotoKtp,
-                    "buku_tabungan" => $pathBukuTabungan,
-                    "surat_ketersediaan" => $pathSuratKetersediaan,
-                ]
+                $data
             );
             DB::commit();
-            Session::flash("success", "Berhasil update biodata");
+            return response()->json([
+                "data" => 'null',
+                "message" => "Berhasil update biodata",
+                "error" => "false"
+            ], 200);
         } catch (Exception $e) {
             Log::error($e);
             DB::rollBack();
@@ -326,10 +361,10 @@ class DashboardController extends Controller
         return response()->download($fullPath);
     }
 
-     public function getTutors(Request $req)
+    public function getTutors(Request $req)
     {
         $user = Auth::guard("user_login")->user();
-        if ($user->role == 'admin') {
+        if ($user->role == 'tutor') {
             return response()->json([
                 "data" => [],
                 "totalPage" => 0
@@ -350,6 +385,8 @@ class DashboardController extends Controller
             "totalPage" => ceil($count / $limit)
         ]);
     }
+
+
     public function getApplications(Request $req)
     {
         $limit = 10;
@@ -365,7 +402,7 @@ class DashboardController extends Controller
             $applications = Lamaran::with(["matkul", "matkul.prodi", 'matkul.prodi.fakultas', "user_login", 'user_login.pribadi'])->whereHas("user_login", function ($q) use ($nama) {
                 $q->whereHas("pribadi", function ($q) use ($nama) {
                     $q->where("nama_lengkap", 'ILIKE', '%' . $nama . '%');
-                }); 
+                });
             });
             $count = $applications->count();
             return response()->json([
@@ -388,6 +425,272 @@ class DashboardController extends Controller
         return response()->json([
             "data" => [],
             "totalPage" => ceil(0 / $limit)
+        ]);
+    }
+
+    public function masterData(Request $req)
+    {
+        $fakultas = Fakultas::all();
+        $prodi = Prodi::with("fakultas")->get();
+        $matkul = Matkul::with("prodi")->get();
+        return Inertia::render("master/master-data", [
+            "fakultas" => $fakultas,
+            "prodi" => $prodi,
+            'matkul' => $matkul
+        ]);
+    }
+
+
+    public function fakultas(Request $req)
+    {
+        $req->validate([
+            "kode_fakultas" => "required|string",
+            "fakultas" => "required|string"
+        ]);
+
+        $kode_fakultas = $req->kode_fakultas;
+        $fakultas = $req->fakultas;
+
+        $existFakultas = Fakultas::where(function ($que) use ($fakultas) {
+            $que->where("nama", 'ILIKE', $fakultas)->orWhere("kode_fakultas", 'ILIKE', $fakultas);
+        })->first();
+        $existKodeFakultas = Fakultas::where(function ($que) use ($kode_fakultas) {
+            $que->where("nama", 'ILIKE', $kode_fakultas)->orWhere("kode_fakultas", 'ILIKE', $kode_fakultas);
+        })->first();
+        if (!empty($existFakultas) || !empty($existKodeFakultas)) {
+            return redirect()->intended('/master-fakultas')->withErrors([
+                "error" => "Fakultas sudah ada"
+            ]);
+        };
+
+        $fakul = new Fakultas();
+        $fakul->kode_fakultas = $kode_fakultas;
+        $fakul->nama = $fakultas;
+        $fakul->save();
+        Session::flash("success", 'Berhasil buat fakultas');
+        return redirect()->intended("/master-fakultas");
+    }
+
+
+
+    public function prodi(Request $req)
+    {
+        $req->validate([
+            "fakultas_id" => "required|string",
+            "kode_prodi" => "required|string",
+            "prodi" => "required|string"
+        ]);
+        $fakultas_id = $req->fakultas_id;
+        $kode_prodi = $req->kode_prodi;
+        $prodi = $req->prodi;
+
+        $existProdi = Prodi::where(function ($que) use ($prodi) {
+            $que->where("nama", 'ILIKE', $prodi)->orWhere("kode_prodi", 'ILIKE', $prodi);
+        })->first();
+        $existKodeProdi = Prodi::where(function ($que) use ($kode_prodi) {
+            $que->where("nama", 'ILIKE', $kode_prodi)->orWhere("kode_prodi", 'ILIKE', $kode_prodi);
+        })->first();
+        if (!empty($existProdi) || !empty($existKodeProdi)) {
+            return redirect()->intended('/master-prodi')->withErrors([
+                "error" => "Prodi sudah ada"
+            ]);
+        };
+
+        $fakultas = Fakultas::where("id", '=', $fakultas_id)->first();
+        if (empty($fakultas)) {
+            return redirect()->intended("/master-prodi")->withErrors([
+                "error" => "Fakultas tidak ada"
+            ]);
+        };
+
+        $prod = new Prodi();
+        $prod->fakultas_id = $fakultas_id;
+        $prod->kode_prodi = $kode_prodi;
+        $prod->nama = $prodi;
+        $prod->save();
+        Session::flash("success", 'Berhasil buat prodi');
+        return redirect()->intended("/master-prodi");
+    }
+
+
+    public function matkul(Request $req)
+    {
+        $req->validate([
+            "prodi_id" => "required|string",
+            "kode_matkul" => "required|string",
+            "matkul" => "required|string"
+        ]);
+        $prodi_id = $req->prodi_id;
+        $kode_matkul = $req->kode_matkul;
+        $matkul = $req->matkul;
+
+        $existMatkul = Matkul::where(function ($que) use ($matkul) {
+            $que->where("nama", 'ILIKE', $matkul)->orWhere("kode_matkul", 'ILIKE', $matkul);
+        })->first();
+        $existKodeMatkul = Matkul::where(function ($que) use ($kode_matkul) {
+            $que->where("nama", 'ILIKE', $kode_matkul)->orWhere("kode_matkul", 'ILIKE', $kode_matkul);
+        })->first();
+        if (!empty($existMatkul) || !empty($existKodeMatkul)) {
+            return redirect()->intended('/master-matkul')->withErrors([
+                "error" => "Matkul sudah ada"
+            ]);
+        };
+
+        $prodi = Prodi::where("id", '=', $prodi_id)->first();
+        if (empty($prodi)) {
+            return redirect()->intended("/master-matkul")->withErrors([
+                "error" => "Prodi tidak ada"
+            ]);
+        };
+
+        $mat = new Matkul();
+        $mat->prodi_id = $prodi_id;
+        $mat->kode_matkul = $kode_matkul;
+        $mat->nama = $matkul;
+        $mat->save();
+        Session::flash("success", 'Berhasil buat matkul');
+        return redirect()->intended("/master-matkul");
+    }
+
+    public function import_matkul(Request $req)
+    {
+        try {
+            $req->validate([
+                "prodi_id" => "required|string",
+                'file' => 'required|mimetypes:text/csv,text/plain,application/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ]);
+            $prodi_id = $req->prodi_id;
+    
+            $prodi = Prodi::where("id", '=', $prodi_id)->first();
+            if (empty($prodi)) {
+                return redirect()->intended("/master-matkul")->withErrors([
+                    "error" => "Prodi tidak ada"
+                ]);
+            };
+    
+            $rows = Excel::toArray([], $req->file('file'))[0];
+    
+            $headers = array_map(fn($col) => strtolower(str_replace(" ", "_", $col)), $rows[0]);
+            $allowedColumns = ["nama", "kode_matkul"];
+            foreach ($headers as $value) {
+                if (!in_array($value, $allowedColumns)) {
+                    return redirect()->intended("/master-matkul")->withErrors([
+                        "error" => "Nama Kolom tidak sesuai. Harus 'nama' dan 'kode_matkul'"
+                    ]);
+                };
+            }
+    
+            $result = [];
+    
+            $existKodeAndNama = [];
+    
+            $matkul = Matkul::all();
+    
+            foreach ($matkul as $mat) {
+                $existKodeAndNama[] = $mat->nama;
+                $existKodeAndNama[] = $mat->kode_matkul;
+            }
+    
+            Log::debug($existKodeAndNama);
+    
+            foreach (array_slice($rows, 1) as $row) {
+                if (in_array($row[1], $existKodeAndNama)) return redirect()->intended("/master-data")->withErrors([
+                    "error" => 'Kode '.$row[1]." sudah ada"
+                ]);
+                if (in_array($row[0], $existKodeAndNama)) return redirect()->intended("/master-data")->withErrors([
+                    "error" => 'Nama '.$row[0]." sudah ada"
+                ]);
+    
+                $result[] = array_combine([...$headers, 'prodi_id'], [...$row, $prodi_id]);
+            }
+    
+    
+            Matkul::insert($result);
+    
+    
+    
+            Session::flash("success", 'Berhasil buat matkul');
+            return redirect()->intended("/master-matkul");
+        } catch (Exception $e) {
+            return redirect()->intended("/master-matkul")->withErrors([
+                'error' => "Terjadi kesalahan"
+            ]);
+        }
+    }
+
+    public function getFakultas(Request $req)
+    {
+        $limit = 10;
+        $currentPage = intval($req->query("page")) ?? 1;
+        $nama = $req->query("nama") ?? '';
+        $skip = ($currentPage - 1) * $limit;
+
+        $fakultas = Fakultas::where("nama", 'ILIKE', '%'.$nama.'%');
+        // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
+        //     Log::debug($nama);
+        //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
+        // });
+        $count = $fakultas->count();
+        return response()->json([
+            "data" => $fakultas->skip($skip)->take($limit)->get(),
+            "totalPage" => ceil($count / $limit)
+        ]);
+    }
+
+    public function getProdi(Request $req)
+    {
+        $limit = 10;
+        $currentPage = intval($req->query("page")) ?? 1;
+        $nama = $req->query("nama") ?? '';
+        $skip = ($currentPage - 1) * $limit;
+
+        $prodi = Prodi::where("nama", 'ILIKE', '%'.$nama.'%')->with("fakultas");
+        // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
+        //     Log::debug($nama);
+        //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
+        // });
+        $count = $prodi->count();
+        return response()->json([
+            "data" => $prodi->skip($skip)->take($limit)->get(),
+            "totalPage" => ceil($count / $limit)
+        ]);
+    }
+
+    public function getMatkul(Request $req)
+    {
+        $limit = 10;
+        $currentPage = intval($req->query("page")) ?? 1;
+        $nama = $req->query("nama") ?? '';
+        $skip = ($currentPage - 1) * $limit;
+
+        $matkul = Matkul::where("nama", 'ILIKE', '%'.$nama.'%')->with("prodi");
+        // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
+        //     Log::debug($nama);
+        //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
+        // });
+        $count = $matkul->count();
+        return response()->json([
+            "data" => $matkul->skip($skip)->take($limit)->get(),
+            "totalPage" => ceil($count / $limit)
+        ]);
+    }
+
+    public function masterFakultas(Request $req) {
+        return Inertia::render("master/fakultas");
+    }
+
+    public function masterProdi(Request $req) {
+        $fakultas = Fakultas::all();
+        return Inertia::render("master/prodi", [
+            'fakultas' => $fakultas
+        ]);
+    }
+
+    public function masterMatkul(Request $req) {
+        $prodi = Prodi::with("fakultas")->get();
+        // $matkul = Matkul::with("prodi")->get();
+        return Inertia::render("master/matkul", [
+            'prodi' => $prodi
         ]);
     }
 }

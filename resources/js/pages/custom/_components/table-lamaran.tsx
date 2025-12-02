@@ -55,6 +55,7 @@ export default function TableLamaran({
             user_id,
         });
         if (error.length > 0) {
+            alert("Terjadi kesalahan saat get data lamaran")
             setError(error);
             setData([]);
         } else {
@@ -70,6 +71,7 @@ export default function TableLamaran({
 
     useEffect(() => {
         const timeout = setTimeout(() => {
+            setCurrentPage(1)
             loadData();
         }, 300);
 

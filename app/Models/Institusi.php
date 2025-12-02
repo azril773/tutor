@@ -11,7 +11,7 @@ class Institusi extends Model
         "institusi",
         "status_pekerjaan",
         "masa_kerja",
-        "pangkat",
+        "golongan",
         "bidang_pekerjaan",
         "user_id",
     ];

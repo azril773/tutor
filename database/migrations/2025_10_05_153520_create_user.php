@@ -28,6 +28,8 @@ return new class extends Migration
             $table->date("tgl_lahir", 200)->nullable(true);
             $table->string("nip", 100)->nullable(true);
             $table->string("nik", 100)->nullable(true);
+            $table->string("nuptk", 100)->nullable(true);
+            $table->string("npwp", 100)->nullable(true);
             $table->string("nidn", 100)->nullable(true);
             $table->string("alamat", 255)->nullable(true);
             $table->string("provinsi", 200)->nullable(true);
@@ -36,7 +38,6 @@ return new class extends Migration
             $table->string("norek", 100)->nullable(true);
             $table->string("atas_nama", 100)->nullable(true);
             $table->string("nama_bank", 100)->nullable(true);
-            $table->string("npwp", 100)->nullable(true);
             $table->bigInteger("user_id");
             $table->foreign("user_id")->references("id")->on("user_login");
             $table->timestamps();
@@ -46,7 +47,7 @@ return new class extends Migration
             $table->string("institusi", 200);
             $table->string("status_pekerjaan", 100);
             $table->string("masa_kerja", 50);
-            $table->string("pangkat", 100);
+            $table->string("golongan", 100);
             $table->string("bidang_pekerjaan", 200);
             $table->bigInteger("user_id");
             $table->foreign("user_id")->references("id")->on("user_login");

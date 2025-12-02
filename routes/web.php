@@ -3,7 +3,6 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomAuth\login;
 use App\Http\Controllers\CustomAuth\registrasi;
-use App\Http\Controllers\CustomAuth\ResetPassword;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,13 +26,31 @@ Route::get("user_login", [login::class, "Login"]);
 Route::post("user_login", [login::class, "LoginProses"]);
 
 
+Route::middleware(['customAuth','adminAuth'])->group(function () {
+    Route::post('approve', [DashboardController::class, 'approveLamaran'])->name('approveLamaran');
+    Route::get("master-data", [DashboardController::class, "masterData"])->name("masterDataPage");
+    Route::get("master-fakultas", [DashboardController::class, "masterFakultas"])->name("masterFakultasPage");
+    Route::get("master-prodi", [DashboardController::class, "masterProdi"])->name("masterProdiPage");
+    Route::get("master-matkul", [DashboardController::class, "masterMatkul"])->name("masterMatkulPage");
+    
+    Route::get("fakultas", [DashboardController::class, "getFakultas"])->name("get_fakultas");
+    Route::get("prodi", [DashboardController::class, "getProdi"])->name("get_prodi");
+    Route::get("matkul", [DashboardController::class, "getMatkul"])->name("get_matkul");
+    Route::post("fakultas", [DashboardController::class, "fakultas"])->name("add_fakultas");
+    Route::post("prodi", [DashboardController::class, "prodi"])->name("add_prodi");
+    Route::post("matkul", [DashboardController::class, "matkul"])->name("add_matkul");
+    Route::post("import_matkul", [DashboardController::class, "import_matkul"])->name("import_add_matkul");
+});
+
+
 Route::middleware(['customAuth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'view'])->name('dashboard');
     Route::get('biodata', [DashboardController::class, 'biodata'])->name('biodata');
     Route::post('biodata', [DashboardController::class, 'updateBiodata'])->name('updateBiodata');
     Route::post('proses-lamaran', [DashboardController::class, 'prosesLamaran'])->name('prosesLamaran');
-    Route::post('approve', [DashboardController::class, 'approveLamaran'])->name('approveLamaran');
     Route::get('dashboard/tutor/{id}', [DashboardController::class, 'detailTutor'])->name('detailTutor');
+    Route::get('applications', [DashboardController::class, 'getApplications'])->name('getApplications');
+    Route::get('tutors', [DashboardController::class, 'getTutors'])->name('getTutors');
     
     Route::get('/files/{path}', [DashboardController::class, 'download'])
      ->where('path', '.*')->name('files.download');
@@ -44,8 +61,6 @@ Route::middleware(['customAuth'])->group(function () {
      
      // Admin
     //  Route::get('admin', [AdminController::class, 'view'])->name('adminView');
-     Route::get('tutors', [DashboardController::class, 'getTutors'])->name('getTutors');
-     Route::get('applications', [DashboardController::class, 'getApplications'])->name('getApplications');
 
     
 

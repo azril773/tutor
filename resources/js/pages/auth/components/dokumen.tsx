@@ -1,5 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Dokumen as DokumenType } from '@/types';
+import { Download } from 'lucide-react';
 import { Dispatch, SetStateAction } from 'react';
 
 export default function Dokumen({
@@ -15,7 +17,8 @@ export default function Dokumen({
     setBukuTabungan,
     suratKetersediaan,
     setSuratKetersediaan,
-    error
+    error,
+    dokumen,
 }: {
     cv: File | null;
     setCv: Dispatch<SetStateAction<File | null>>;
@@ -29,8 +32,10 @@ export default function Dokumen({
     setBukuTabungan: Dispatch<SetStateAction<File | null>>;
     suratKetersediaan: File | null;
     setSuratKetersediaan: Dispatch<SetStateAction<File | null>>;
-    error: Record<string, string>
+    error: Record<string, string>;
+    dokumen?: DokumenType;
 }) {
+    console.log(dokumen);
     return (
         <>
             <div className="flex justify-between">
@@ -38,7 +43,20 @@ export default function Dokumen({
             </div>
             <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <Label>CV</Label>
+                    <Label>
+                        CV{' '}
+                        {dokumen?.cv && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.cv}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="cv"
                         id="cv"
@@ -61,7 +79,20 @@ export default function Dokumen({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Ijazah</Label>
+                    <Label>
+                        Ijazah{' '}
+                        {dokumen?.ijazah && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.ijazah}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="ijazah"
                         id="ijazah"
@@ -84,7 +115,20 @@ export default function Dokumen({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>RPS</Label>
+                    <Label>
+                        RPS{' '}
+                        {dokumen?.rps && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.rps}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="rps"
                         id="rps"
@@ -109,13 +153,26 @@ export default function Dokumen({
             </div>
             <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <Label>Foto Ktp</Label>
+                    <Label>
+                        Foto Ktp{' '}
+                        {dokumen?.foto_ktp && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.foto_ktp}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="Foto Ktp"
                         id="fotoKtp"
                         name="fotoKtp"
                         type="file"
-                        accept=".jpg, .jpeg, .png"
+                        accept=".jpg, .jpeg, .png, .pdf, .docx"
                         onChange={(file) => {
                             if (
                                 file.target.files &&
@@ -132,7 +189,20 @@ export default function Dokumen({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Buku Tabungan</Label>
+                    <Label>
+                        Buku Tabungan{' '}
+                        {dokumen?.buku_tabungan && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.buku_tabungan}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="Buku Tabungan"
                         id="bukuTabungan"
@@ -155,7 +225,20 @@ export default function Dokumen({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Surat Ketersediaan</Label>
+                    <Label>
+                        Surat Ketersediaan{' '}
+                        {dokumen?.surat_ketersediaan && (
+                            <Download
+                                onClick={() =>
+                                    window.open(
+                                        `/files/${dokumen.surat_ketersediaan}`,
+                                        '_blank',
+                                    )
+                                }
+                                className="h-4 w-4"
+                            />
+                        )}
+                    </Label>
                     <Input
                         title="suratKetersediaan"
                         id="suratKetersediaan"

@@ -19,7 +19,6 @@ import AppLogo from './app-logo';
 
 export function AppSidebar() {
     const props = usePage().props
-    console.log(props)
     const mainNavItems: NavItem[] = [
         {
             title: 'Bioadata',
@@ -42,6 +41,24 @@ export function AppSidebar() {
         {
             title: 'Admin',
             href: "/dashboard",
+            icon: MailPlus,
+            groups: ["admin"]
+        },
+        {
+            title: 'Data Fakultas',
+            href: "/master-fakultas",
+            icon: MailPlus,
+            groups: ["admin"]
+        },
+        {
+            title: 'Data Program Studi',
+            href: "/master-prodi",
+            icon: MailPlus,
+            groups: ["admin"]
+        },
+        {
+            title: 'Data Mata Kuliah',
+            href: "/master-matkul",
             icon: MailPlus,
             groups: ["admin"]
         },

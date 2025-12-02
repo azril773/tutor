@@ -30,6 +30,10 @@ export default function DataPribadi({
     setNik,
     nidn,
     setNidn,
+    nuptk,
+    setNuptk,
+    npwp,
+    setNpwp,
     provinsi,
     setProvinsi,
     kabkot,
@@ -62,6 +66,10 @@ export default function DataPribadi({
     setNik: Dispatch<SetStateAction<string>>;
     nidn: string;
     setNidn: Dispatch<SetStateAction<string>>;
+    nuptk: string;
+    setNuptk: Dispatch<SetStateAction<string>>;
+    npwp: string;
+    setNpwp: Dispatch<SetStateAction<string>>;
     provinsi: string;
     setProvinsi: Dispatch<SetStateAction<string>>;
     kabkot: string;
@@ -82,19 +90,22 @@ export default function DataPribadi({
 }) {
     const [dataKota, setDataKota] = useState<Record<string, string>>({});
     const nameToCodeProvinsi = (name: string): string => {
-        const code = Object.entries(DataProvinsi).find(([key, value]) => value === name)?.[0] ?? ''
-        return code
-    }
+        const code =
+            Object.entries(DataProvinsi).find(
+                ([key, value]) => value === name,
+            )?.[0] ?? '';
+        return code;
+    };
 
     useEffect(() => {
-        let tempKota = {}
+        let tempKota = {};
         Object.entries(DataKota).forEach(([key, item]) => {
             if (key.startsWith(nameToCodeProvinsi(provinsi))) {
                 tempKota = Object.assign(tempKota, { [key]: item });
             }
         });
-        setDataKota(tempKota)
-    }, [provinsi])
+        setDataKota(tempKota);
+    }, [provinsi]);
     return (
         <>
             <div className="text-md my-3 font-semibold">Data Pribadi</div>
@@ -109,6 +120,7 @@ export default function DataPribadi({
                         maxLength={100}
                         onChange={(value) => setNamaLengkap(value.target.value)}
                         autoFocus
+                        required={true}
                     />
                     <span className="-mt-4 text-sm text-red-500">
                         {error['namaLengkap'] ?? ''}
@@ -122,22 +134,27 @@ export default function DataPribadi({
                         name="email"
                         type="text"
                         onChange={(value) => setEmail(value.target.value)}
+                        required={true}
                     />
                     <span className="-mt-4 text-sm text-red-500">
                         {error['email'] ?? ''}
                     </span>
                 </div>
             </div>
-            <div className="my-4 grid grid-cols-1 gap-4 w-full lg:grid-cols-3">
+            <div className="my-4 grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
                 <div className="grid w-full gap-2">
-                    <Label>Tanggal Lahir</Label>
+                    <Label>
+                        Tanggal Lahir <span className="text-red-500">*</span>
+                    </Label>
                     <CustomDatePicker date={tglLahir} setDate={setTglLahir} />
                     <span className="-mt-2 text-sm text-red-500">
                         {error['tglLahir'] ?? ''}
                     </span>
                 </div>
                 <div className="grid w-full gap-4 lg:justify-center">
-                    <Label>Jenis Kelamin</Label>
+                    <Label>
+                        Jenis Kelamin <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                         name="jk"
                         defaultValue={jk}
@@ -156,7 +173,9 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-2">
-                    <Label>No WA / No Hp</Label>
+                    <Label>
+                        No WA / No Hp <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={nowa}
                         allowNegative={false}
@@ -172,7 +191,9 @@ export default function DataPribadi({
             </div>
             <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <Label>NIP</Label>
+                    <Label>
+                        NIP <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={nip}
                         allowLeadingZeros={true}
@@ -187,7 +208,9 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>NIK</Label>
+                    <Label>
+                        NIK <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={nik}
                         allowLeadingZeros={true}
@@ -202,7 +225,9 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>NIDN</Label>
+                    <Label>
+                        NIDN <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={nidn}
                         allowLeadingZeros={true}
@@ -217,16 +242,59 @@ export default function DataPribadi({
                     </span>
                 </div>
             </div>
+            <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="grid w-full gap-4">
+                    <Label>
+                        NUPTK <span className="text-red-500">*</span>
+                    </Label>
+                    <NumericFormat
+                        defaultValue={nuptk}
+                        allowLeadingZeros={true}
+                        allowNegative={true}
+                        customInput={Input}
+                        maxLength={20}
+                        onChange={(value) => setNuptk(value.target.value)}
+                        name="nuptk"
+                    />
+                    <span className="-mt-4 text-sm text-red-500">
+                        {error['nuptk'] ?? ''}
+                    </span>
+                </div>
+                <div className="grid w-full gap-4">
+                    <Label>
+                        NPWP <span className="text-red-500">*</span>
+                    </Label>
+                    <NumericFormat
+                        defaultValue={npwp}
+                        allowLeadingZeros={true}
+                        allowNegative={true}
+                        customInput={Input}
+                        maxLength={20}
+                        onChange={(value) => setNpwp(value.target.value)}
+                        name="npwp"
+                    />
+                    <span className="-mt-4 text-sm text-red-500">
+                        {error['npwp'] ?? ''}
+                    </span>
+                </div>
+                
+            </div>
             <Separator className="my-4" />
-            <span className="text-md font-semibold">Alamat Domisili</span>
+            <span className="text-md font-semibold">Alamat Domisili </span>
             <div className="my-4 grid grid-cols-1 lg:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <Label>Provinsi</Label>
+                    <Label>
+                        Provinsi <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                         defaultValue={nameToCodeProvinsi(provinsi)}
                         name="provinsi"
                         onValueChange={(value) => {
-                            setProvinsi(DataProvinsi[value as keyof typeof DataProvinsi]);
+                            setProvinsi(
+                                DataProvinsi[
+                                    value as keyof typeof DataProvinsi
+                                ],
+                            );
                         }}
                     >
                         <SelectTrigger className="w-[300px]">
@@ -247,7 +315,9 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Kab / Kota</Label>
+                    <Label>
+                        Kab / Kota <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                         name="kabkot"
                         defaultValue={kabkot}
@@ -269,7 +339,9 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Kode POS</Label>
+                    <Label>
+                        Kode POS <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={kodePos}
                         allowLeadingZeros={true}
@@ -286,7 +358,9 @@ export default function DataPribadi({
             </div>
             <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-1">
                 <div className="grid w-full gap-4">
-                    <Label>Alamat</Label>
+                    <Label>
+                        Alamat <span className="text-red-500">*</span>
+                    </Label>
                     <Textarea
                         onChange={(value) => setAlamat(value.target.value)}
                         name="alamat"
@@ -298,10 +372,12 @@ export default function DataPribadi({
                 </div>
             </div>
             <Separator className="my-4" />
-            <span className="text-md font-semibold">Rekening</span>
+            <span className="text-md font-semibold">Rekening </span>
             <div className="my-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <Label>No Rekening</Label>
+                    <Label>
+                        No Rekening <span className="text-red-500">*</span>
+                    </Label>
                     <NumericFormat
                         defaultValue={norek}
                         allowLeadingZeros={true}
@@ -325,6 +401,7 @@ export default function DataPribadi({
                         type="text"
                         maxLength={100}
                         onChange={(value) => setAtasNama(value.target.value)}
+                        required={true}
                     />
                     <span className="-mt-4 text-sm text-red-500">
                         {error['atasNama'] ?? ''}
@@ -339,6 +416,7 @@ export default function DataPribadi({
                         type="text"
                         maxLength={100}
                         onChange={(value) => setNamaBank(value.target.value)}
+                        required={true}
                     />
                     <span className="-mt-4 text-sm text-red-500">
                         {error['namaBank'] ?? ''}
