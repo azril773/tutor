@@ -22,15 +22,24 @@ export default function ResetPassword() {
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Reset Password" />
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                        {Object.values(errors).map((value) => (
+                    {Object.values(errors).map((value) => (
                         <span className="text-sm text-red-500">{value}</span>
                     ))}
-                {flash.success && (
-                    <>
-                    <span className="text-sm text-green-500 capitalize">{flash.success}</span>
-                    </>
-                )}
-                    <Form {...resetPasswordPost.form()} method='post'>
+                    {flash.success && (
+                        <>
+                            <span className="text-sm text-green-500 capitalize">
+                                {flash.success}
+                            </span>
+                        </>
+                    )}
+                    <Form {...resetPasswordPost.form()} method="post">
+                        <div className='mb-2 flex flex-col gap-2'>
+                            <Label>Password Lama</Label>
+                            <Input
+                                type="password"
+                                name="passwordlama"
+                            />
+                        </div>
                         <div className="grid gap-2 md:grid-cols-2">
                             <div className="flex flex-col gap-2">
                                 <Label>Password Baru</Label>
@@ -62,10 +71,14 @@ export default function ResetPassword() {
                             </div>
                         </div>
                         <div>
-                            <Button onClick={() => {
-                                setPasswordBaru("")
-                                setKonfirmasiPasswordBaru("")
-                            }}>Reset</Button>
+                            <Button
+                                onClick={() => {
+                                    setPasswordBaru('');
+                                    setKonfirmasiPasswordBaru('');
+                                }}
+                            >
+                                Reset
+                            </Button>
                         </div>
                     </Form>
                 </div>

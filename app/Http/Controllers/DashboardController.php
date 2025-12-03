@@ -137,7 +137,7 @@ class DashboardController extends Controller
 
         $id = $req->id;
 
-        $lamaran = Lamaran::with("user_login","user_login.pribadi")->findOrFail($id);
+        $lamaran = Lamaran::with("user_login", "user_login.pribadi")->findOrFail($id);
         Log::debug($lamaran);
         $lamaran->update([
             "status" => "APPROVED"
@@ -161,7 +161,7 @@ class DashboardController extends Controller
 
         $id = $req->id;
 
-        $lamaran = Lamaran::with("user_login","user_login.pribadi")->findOrFail($id);
+        $lamaran = Lamaran::with("user_login", "user_login.pribadi")->findOrFail($id);
         Log::debug($lamaran);
         $lamaran->update([
             "status" => "REJECTED"
@@ -174,10 +174,12 @@ class DashboardController extends Controller
     public function resetPasswordPost(Request $req)
     {
         $validated = $req->validate([
+            "passwordlama" => "required|string",
             "password" => "required|string",
             "password2" => "required|string"
         ]);
 
+        $passwordlama = $req->passwordlama;
         $password = $req->password;
         $password2 = $req->password2;
 
@@ -187,6 +189,12 @@ class DashboardController extends Controller
             ]);
         };
         $user = Auth::guard("user_login")->user();
+
+        if (!Hash::check($passwordlama, $user->password)) {
+            return redirect()->intended("/reset-password")->withErrors([
+                "password" => "Password lama salah"
+            ]);
+        }
 
         $getUser = UserLogin::where("id", $user->id)->first();
         if (!$getUser) {
@@ -247,15 +255,15 @@ class DashboardController extends Controller
         $masaKerja = $req->masaKerja;
         $golongan = $req->golongan;
         $bidangPekerjaan = $req->bidangPekerjaan;
-        
+
         // Pendidikan
         $pendidikan = $req->pendidikan;
         $transformPendidikan = json_decode($pendidikan);
-        
-        
+
+
         DB::beginTransaction();
         try {
-            Log::debug($nuptk.' '.$npwp);
+            Log::debug($nuptk . ' ' . $npwp);
             Pribadi::updateOrCreate(
                 ["user_id" => $id],
                 [
@@ -276,9 +284,9 @@ class DashboardController extends Controller
                     "norek" => $norek,
                     "atas_nama" => $atasNama,
                     "nama_bank" => $namaBank,
-                    ]
-                );
-                
+                ]
+            );
+
             Institusi::updateOrCreate(
                 ["user_id" => $id],
                 [
@@ -588,16 +596,16 @@ class DashboardController extends Controller
                 'file' => 'required|mimetypes:text/csv,text/plain,application/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             ]);
             $prodi_id = $req->prodi_id;
-    
+
             $prodi = Prodi::where("id", '=', $prodi_id)->first();
             if (empty($prodi)) {
                 return redirect()->intended("/master-matkul")->withErrors([
                     "error" => "Prodi tidak ada"
                 ]);
             };
-    
+
             $rows = Excel::toArray([], $req->file('file'))[0];
-    
+
             $headers = array_map(fn($col) => strtolower(str_replace(" ", "_", $col)), $rows[0]);
             $allowedColumns = ["nama", "kode_matkul"];
             foreach ($headers as $value) {
@@ -607,36 +615,36 @@ class DashboardController extends Controller
                     ]);
                 };
             }
-    
+
             $result = [];
-    
+
             $existKodeAndNama = [];
-    
+
             $matkul = Matkul::all();
-    
+
             foreach ($matkul as $mat) {
                 $existKodeAndNama[] = $mat->nama;
                 $existKodeAndNama[] = $mat->kode_matkul;
             }
-    
+
             Log::debug($existKodeAndNama);
-    
+
             foreach (array_slice($rows, 1) as $row) {
                 if (in_array($row[1], $existKodeAndNama)) return redirect()->intended("/master-data")->withErrors([
-                    "error" => 'Kode '.$row[1]." sudah ada"
+                    "error" => 'Kode ' . $row[1] . " sudah ada"
                 ]);
                 if (in_array($row[0], $existKodeAndNama)) return redirect()->intended("/master-data")->withErrors([
-                    "error" => 'Nama '.$row[0]." sudah ada"
+                    "error" => 'Nama ' . $row[0] . " sudah ada"
                 ]);
-    
+
                 $result[] = array_combine([...$headers, 'prodi_id'], [...$row, $prodi_id]);
             }
-    
-    
+
+
             Matkul::insert($result);
-    
-    
-    
+
+
+
             Session::flash("success", 'Berhasil buat matkul');
             return redirect()->intended("/master-matkul");
         } catch (Exception $e) {
@@ -653,7 +661,7 @@ class DashboardController extends Controller
         $nama = $req->query("nama") ?? '';
         $skip = ($currentPage - 1) * $limit;
 
-        $fakultas = Fakultas::where("nama", 'ILIKE', '%'.$nama.'%');
+        $fakultas = Fakultas::where("nama", 'ILIKE', '%' . $nama . '%');
         // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
         //     Log::debug($nama);
         //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
@@ -672,7 +680,7 @@ class DashboardController extends Controller
         $nama = $req->query("nama") ?? '';
         $skip = ($currentPage - 1) * $limit;
 
-        $prodi = Prodi::where("nama", 'ILIKE', '%'.$nama.'%')->with("fakultas");
+        $prodi = Prodi::where("nama", 'ILIKE', '%' . $nama . '%')->with("fakultas");
         // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
         //     Log::debug($nama);
         //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
@@ -691,7 +699,7 @@ class DashboardController extends Controller
         $nama = $req->query("nama") ?? '';
         $skip = ($currentPage - 1) * $limit;
 
-        $matkul = Matkul::where("nama", 'ILIKE', '%'.$nama.'%')->with("prodi");
+        $matkul = Matkul::where("nama", 'ILIKE', '%' . $nama . '%')->with("prodi");
         // with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
         //     Log::debug($nama);
         //     $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
@@ -703,18 +711,21 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function masterFakultas(Request $req) {
+    public function masterFakultas(Request $req)
+    {
         return Inertia::render("master/fakultas");
     }
 
-    public function masterProdi(Request $req) {
+    public function masterProdi(Request $req)
+    {
         $fakultas = Fakultas::all();
         return Inertia::render("master/prodi", [
             'fakultas' => $fakultas
         ]);
     }
 
-    public function masterMatkul(Request $req) {
+    public function masterMatkul(Request $req)
+    {
         $prodi = Prodi::with("fakultas")->get();
         // $matkul = Matkul::with("prodi")->get();
         return Inertia::render("master/matkul", [
