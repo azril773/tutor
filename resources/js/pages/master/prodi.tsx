@@ -65,12 +65,13 @@ export default function ProdiPage({ fakultas }: { fakultas: Fakultas[] }) {
 }
 
 function ProdiComponent({ fakultas }: { fakultas: Fakultas[] }) {
+    const csrf_token = usePage().props.csrf_token
     const [open, setOpen] = useState<boolean>(false);
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
             <form ref={buttonRef} action='/prodi' method="post">
-                <input type="hidden" name='csrf_token' />
+                <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
                         <Label>Fakultas</Label>

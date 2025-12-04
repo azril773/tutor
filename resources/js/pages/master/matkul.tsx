@@ -1,4 +1,3 @@
-import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import PaginationStateful from '@/components/custom/pagination-stateful';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Matkul, Prodi } from '@/types';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { GetMatkul } from '../_api/master-data';
 import DialogComponent from '../_components/dialog-component';
@@ -66,11 +65,13 @@ export default function MatkulPage({ prodi }: { prodi: Prodi[] }) {
 }
 
 function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
+    const csrf_token = usePage().props.csrf_token;
     const [open, setOpen] = useState<boolean>(false);
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
-            <form ref={buttonRef} action='/matkul' method="post">
+            <form ref={buttonRef} action="/matkul" method="post">
+                <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
                         <Label>Prodi</Label>
@@ -118,11 +119,13 @@ function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
     );
 }
 function ImportMatkul({ prodi }: { prodi: Prodi[] }) {
+    const csrf_token = usePage().props.csrf_token;
     const [open, setOpen] = useState<boolean>(false);
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
-            <form ref={buttonRef} action='/import_matkul' method="post">
+            <form ref={buttonRef} action="/import_matkul" method="post">
+                <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label>Prodi</Label>
@@ -143,7 +146,12 @@ function ImportMatkul({ prodi }: { prodi: Prodi[] }) {
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label>File</Label>
+                        <Label className='flex justify-between'>
+                            File
+                            <a className='text-blue-500' href="/template.xlsx" download>
+                                Template
+                            </a>
+                        </Label>
                         <Input
                             title="File"
                             type="file"

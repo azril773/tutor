@@ -132,11 +132,13 @@ function TableFakultas() {
 
 
 function FakultasComponent() {
+    const csrf_token = usePage().props.csrf_token
     const [open, setOpen] = useState<boolean>(false);
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
             <form ref={buttonRef} action="/fakultas" method="post">
+            <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label>Fakultas</Label>
