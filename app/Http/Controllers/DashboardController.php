@@ -75,10 +75,13 @@ class DashboardController extends Controller
             "fakultas" => "required|string",
             "prodi" => "required|string",
             "matkul" => "required|string",
+            "semester" => "required|string",
         ]);
 
         $matkul = $req->matkul;
-        $getMatkul = Matkul::where("kode_matkul", $matkul)->get();
+        Log::debug($matkul);
+        $semester = $req->semester;
+        $getMatkul = Matkul::where("kode_matkul", $matkul)->where("semester", $semester)->get();
 
         if ($getMatkul->isEmpty()) {
             return redirect()->back()->withErrors([
@@ -114,6 +117,7 @@ class DashboardController extends Controller
         $lamaran->matkul_id = $getMatkul[0]->id;
         Session::flash("success", "Berhasil melamar");
         $lamaran->save();
+        return redirect()->intended("/dashboard");
     }
 
     public function resetPassword(Request $req)
@@ -464,18 +468,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function masterData(Request $req)
-    {
-        $fakultas = Fakultas::all();
-        $prodi = Prodi::with("fakultas")->get();
-        $matkul = Matkul::with("prodi")->get();
-        return Inertia::render("master/master-data", [
-            "fakultas" => $fakultas,
-            "prodi" => $prodi,
-            'matkul' => $matkul
-        ]);
-    }
-
 
     public function fakultas(Request $req)
     {
@@ -554,11 +546,13 @@ class DashboardController extends Controller
         $req->validate([
             "prodi_id" => "required|string",
             "kode_matkul" => "required|string",
-            "matkul" => "required|string"
+            "matkul" => "required|string",
+            "semester" => "required|string"
         ]);
         $prodi_id = $req->prodi_id;
         $kode_matkul = $req->kode_matkul;
         $matkul = $req->matkul;
+        $semester = $req->semester;
 
         $existMatkul = Matkul::where(function ($que) use ($matkul) {
             $que->where("nama", 'ILIKE', $matkul)->orWhere("kode_matkul", 'ILIKE', $matkul);
@@ -583,6 +577,7 @@ class DashboardController extends Controller
         $mat->prodi_id = $prodi_id;
         $mat->kode_matkul = $kode_matkul;
         $mat->nama = $matkul;
+        $mat->semester = $semester;
         $mat->save();
         Session::flash("success", 'Berhasil buat matkul');
         return redirect()->intended("/master-matkul");

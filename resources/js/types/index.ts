@@ -119,6 +119,7 @@ export type Matkul = {
     kode_matkul: string;
     nama: string;
     prodi: Prodi;
+    semester: string
 };
 
 export type LamaranType = {

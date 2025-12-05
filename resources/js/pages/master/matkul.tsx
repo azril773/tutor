@@ -92,6 +92,56 @@ function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
                         </Select>
                     </div>
                     <div className="space-y-2">
+                        <Label>Semester</Label>
+                        <Select name="semester">
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Semester" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    value={"Semester 1"}
+                                >
+                                    Semester 1
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 2"}
+                                >
+                                    Semester 2
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 3"}
+                                >
+                                    Semester 3
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 4"}
+                                >
+                                    Semester 4
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 5"}
+                                >
+                                    Semester 5
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 6"}
+                                >
+                                    Semester 6
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 7"}
+                                >
+                                    Semester 7
+                                </SelectItem>
+                                <SelectItem
+                                    value={"Semester 8"}
+                                >
+                                    Semester 8
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
                         <Label>Mata Kuliah</Label>
                         <Input title="Mata Kuliah" type="text" name="matkul" />
                     </div>
@@ -146,9 +196,13 @@ function ImportMatkul({ prodi }: { prodi: Prodi[] }) {
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label className='flex justify-between'>
+                        <Label className="flex justify-between">
                             File
-                            <a className='text-blue-500' href="/template.xlsx" download>
+                            <a
+                                className="text-blue-500"
+                                href="/template.xlsx"
+                                download
+                            >
                                 Template
                             </a>
                         </Label>
@@ -227,6 +281,7 @@ function TableMatkul() {
                         <TableRow>
                             <TableHead>Kode Mata Kuliah</TableHead>
                             <TableHead>Nama Mata Kuliah</TableHead>
+                            <TableHead>Semester</TableHead>
                             <TableHead>Prodi</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -236,6 +291,7 @@ function TableMatkul() {
                             <TableRow key={index}>
                                 <TableCell>{dt.kode_matkul ?? '-'}</TableCell>
                                 <TableCell>{dt.nama ?? '-'}</TableCell>
+                                <TableCell>{dt.semester ?? '-'}</TableCell>
                                 <TableCell>{dt.prodi.nama ?? '-'}</TableCell>
                             </TableRow>
                         ))}
