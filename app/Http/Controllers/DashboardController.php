@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\LamaranExport;
 use App\Mail\approve;
 use App\Mail\reject;
 use App\Mail\SendUser;
@@ -726,5 +727,10 @@ class DashboardController extends Controller
         return Inertia::render("master/matkul", [
             'prodi' => $prodi
         ]);
+    }
+
+    public function download_lamaran(Request $req) {
+        return Excel::download(new LamaranExport, 'lamaran.xlsx');
+
     }
 }

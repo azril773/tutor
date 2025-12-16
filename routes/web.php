@@ -41,6 +41,7 @@ Route::middleware(['customAuth','adminAuth'])->group(function () {
     Route::post("prodi", [DashboardController::class, "prodi"])->name("add_prodi");
     Route::post("matkul", [DashboardController::class, "matkul"])->name("add_matkul");
     Route::post("import_matkul", [DashboardController::class, "import_matkul"])->name("import_add_matkul");
+    Route::get("download_lamaran", [DashboardController::class, "download_lamaran"])->name("download_lamaran");
 });
 
 
