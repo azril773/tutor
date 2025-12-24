@@ -13,7 +13,6 @@ import {
 import { usePage } from '@inertiajs/react';
 import { FileText, Landmark, University, Users } from 'lucide-react';
 import { useState } from 'react';
-import { updateBiodata } from '../_api/biodata';
 import DataInstitusi from '../auth/components/data-institusi';
 import DataPendidikan from '../auth/components/data-pendidikan';
 import DataPribadi from '../auth/components/data-pribadi';
@@ -24,13 +23,13 @@ export default function Biodata({
     dataPribadi,
     dataInstitusi,
     dataPendidikan,
-    dokumen
+    dokumen,
 }: {
     idUser: string;
     dataPribadi: Pribadi | null;
     dataInstitusi?: Institusi;
     dataPendidikan: Pendidikan[];
-    dokumen?: DokumenType
+    dokumen?: DokumenType;
 }) {
     const page = usePage();
     const arrayMenu: string[] = [
@@ -99,7 +98,6 @@ export default function Biodata({
         null,
     );
 
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [error, setError] = useState<Record<string, string>>({});
     const [pdkError, setPdkError] = useState<
         Record<string, Partial<Pendidikan>>
@@ -169,7 +167,6 @@ export default function Biodata({
         if (namaBank.length <= 0)
             tempError['namaBank'] = 'Form ini harus diisi.';
 
-        console.log('OKOKOk');
         setError(tempError);
         return Object.keys(tempError).length === 0;
     };
@@ -182,7 +179,8 @@ export default function Biodata({
             tempError['statusPekerjaan'] = 'Form ini harus diisi.';
         if (masaKerja.length <= 0)
             tempError['masaKerja'] = 'Form ini harus diisi.';
-        if (golongan.length <= 0) tempError['golongan'] = 'Form ini harus diisi.';
+        if (golongan.length <= 0)
+            tempError['golongan'] = 'Form ini harus diisi.';
         if (bidangPekerjaan.length <= 0)
             tempError['bidangPekerjaan'] = 'Form ini harus diisi.';
         setError(tempError);
@@ -226,63 +224,13 @@ export default function Biodata({
         setError(tempError);
         return Object.keys(tempError).length === 0;
     };
-
-    const handleSubmitForm = async (idUser: string) => {
-        const formData = new FormData();
-        formData.append('id', idUser);
-        formData.append('namaLengkap', namalengkap);
-        formData.append('email', email);
-        formData.append(
-            'tgl_lahir',
-            new Date(tglLahir ?? '')?.toISOString() ?? '',
-        );
-        formData.append('jk', jk);
-        formData.append('nowa', nowa);
-        formData.append('nip', nip);
-        formData.append('nik', nik);
-        formData.append('nidn', nidn);
-        formData.append('nuptk', nuptk);
-        formData.append('npwp', npwp);
-        formData.append('provinsi', provinsi);
-        formData.append('kabkot', kabkot);
-        formData.append('kodePos', kodePos);
-        formData.append('alamat', alamat);
-        formData.append('norek', norek);
-        formData.append('atasNama', atasNama);
-        formData.append('namaBank', namaBank);
-        formData.append('institusi', institusi);
-        formData.append('statusPekerjaan', statusPekerjaan);
-        formData.append('masaKerja', masaKerja);
-        formData.append('golongan', golongan);
-        formData.append('bidangPekerjaan', bidangPekerjaan);
-        formData.append('pendidikan', JSON.stringify(pendidikan));
-        formData.append('cv', cv as Blob ?? '');
-        formData.append('ijazah', ijazah as Blob ?? '');
-        formData.append('rps', rps as Blob ?? '');
-        formData.append('fotoKtp', fotoKtp as Blob ?? '');
-        formData.append('bukuTabungan', bukuTabungan as Blob ?? '');
-        formData.append('suratKetersediaan', suratKetersediaan as Blob ?? '');
-
-        const { data, message, error } = await updateBiodata({
-            formData,
-            csrf_token: page.props.csrf_token,
-        });
-        if (error === 'true') {
-            setLoading(false)
-            alert(message)
-        }else{
-            alert(message)
-            window.location.href = '/biodata'
-        }
-
-    };
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Biodata',
             href: '/biodata',
         },
     ];
+
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>
@@ -343,134 +291,144 @@ export default function Biodata({
                         </Button>
                     </div>
                 </div>
-                {Object.values(errors).map((value) => (
+                <div className="mx-5">
+                    {Object.values(page.props.errors).map((value) => (
                     <span className="text-sm text-red-500">{value}</span>
                 ))}
-                {page.props.flash.error && (
-                    <span className="text-sm text-red-500">
-                        {page.props.flash.error}
-                    </span>
-                )}
-                {page.props.flash.success && (
-                    <span className="text-sm text-green-500">
-                        {page.props.flash.success}
-                    </span>
-                )}
-                <section className="mx-10 my-10">
-                    <section
-                        id="data-pribadi"
-                        className={`${view !== 'pribadi' ? 'hidden' : ''}`}
-                    >
-                        <DataPribadi
-                            namaLengkap={namalengkap}
-                            setNamaLengkap={setNamaLengkap}
-                            email={email}
-                            setEmail={setEmail}
-                            jk={jk}
-                            setJk={setJk}
-                            nowa={nowa}
-                            setNowa={setNowa}
-                            nip={nip}
-                            setNip={setNip}
-                            nik={nik}
-                            setNik={setNik}
-                            nidn={nidn}
-                            setNidn={setNidn}
-                            nuptk={nuptk}
-                            setNuptk={setNuptk}
-                            npwp={npwp}
-                            setNpwp={setNpwp}
-                            provinsi={provinsi}
-                            setProvinsi={setProvinsi}
-                            kabkot={kabkot}
-                            setKabkot={setKabkot}
-                            kodePos={kodePos}
-                            setKodepos={setKodePos}
-                            alamat={alamat}
-                            setAlamat={setAlamat}
-                            norek={norek}
-                            setNorek={setNorek}
-                            atasNama={atasNama}
-                            setAtasNama={setAtasNama}
-                            namaBank={namaBank}
-                            setNamaBank={setNamaBank}
-                            tglLahir={tglLahir}
-                            setTglLahir={setTglLahir}
-                            error={error}
-                        />
-                    </section>
-                    <section
-                        id="data-institusi"
-                        className={`${view !== 'institusi' ? 'hidden' : ''}`}
-                    >
-                        <DataInstitusi
-                            institusi={institusi}
-                            setInstitusi={setInstitusi}
-                            statusPekerjaan={statusPekerjaan}
-                            setStatusPekerjaan={setStatusPekerjaan}
-                            masaKerja={masaKerja}
-                            setMasaKerja={setMasaKerja}
-                            golongan={golongan}
-                            setGolongan={setGolongan}
-                            bidangPekerjaan={bidangPekerjaan}
-                            setBidangPekerjaan={setBidangPekerjaan}
-                            error={error}
-                        />
-                    </section>
-                    <section
-                        id="data-institusi"
-                        className={`${view !== 'pendidikan' ? 'hidden' : ''}`}
-                    >
-                        <DataPendidikan
-                            pendidikan={pendidikan}
-                            setPendidikan={setPendidikan}
-                            pdkError={pdkError}
-                        />
-                    </section>
-                    <section
-                        id="data-institusi"
-                        className={`${view !== 'dokumen' ? 'hidden' : ''}`}
-                    >
-                        <Dokumen
-                            cv={cv}
-                            setCv={setCv}
-                            ijazah={ijazah}
-                            setIjazah={setIjazah}
-                            rps={rps}
-                            setRps={setRps}
-                            fotoKtp={fotoKtp}
-                            setFotoKtp={setFotoKtp}
-                            bukuTabungan={bukuTabungan}
-                            setBukuTabungan={setBukuTabungan}
-                            suratKetersediaan={suratKetersediaan}
-                            setSuratKetersediaan={setSuratKetersediaan}
-                            error={error}
-                            dokumen={dokumen}
-                        />
-                    </section>
-                </section>
-                <div className="flex justify-end">
-                    <Button
-                        className={`${view !== 'dokumen' ? 'hidden' : ''}`}
-                        onClick={() => {
-                            // console.log(checkFile());
-                            setLoading(true);
-                            handleSubmitForm(idUser);
-                        }}
-                    >
-                        Update {loading && <Spinner />}
-                    </Button>
-                    <Button
-                        className={`${view === 'dokumen' ? 'hidden' : ''}`}
-                        type="button"
-                        onClick={() => {
-                            const menu = arrayMenu[arrayMenu.indexOf(view) + 1];
-                            handleViewChange(menu);
-                        }}
-                    >
-                        Berikutnya
-                    </Button>
+                    {page.props.flash.error && (
+                        <span className="text-sm text-red-500">
+                            {page.props.flash.error}
+                        </span>
+                    )}
+                    {page.props.flash.success && (
+                        <span className="text-sm text-green-500">
+                            {page.props.flash.success}
+                        </span>
+                    )}
                 </div>
+                <form action="/biodata" method="post" encType="multipart/form-data">
+                    <input
+                        type="hidden"
+                        name="_token"
+                        value={page.props.csrf_token}
+                    />
+                    <input type="hidden" name="id" value={idUser} />
+                    <section className="mx-10 my-10">
+                        <section
+                            id="data-pribadi"
+                            className={`${view !== 'pribadi' ? 'hidden' : ''}`}
+                        >
+                            <DataPribadi
+                                namaLengkap={namalengkap}
+                                setNamaLengkap={setNamaLengkap}
+                                email={email}
+                                setEmail={setEmail}
+                                jk={jk}
+                                setJk={setJk}
+                                nowa={nowa}
+                                setNowa={setNowa}
+                                nip={nip}
+                                setNip={setNip}
+                                nik={nik}
+                                setNik={setNik}
+                                nidn={nidn}
+                                setNidn={setNidn}
+                                nuptk={nuptk}
+                                setNuptk={setNuptk}
+                                npwp={npwp}
+                                setNpwp={setNpwp}
+                                provinsi={provinsi}
+                                setProvinsi={setProvinsi}
+                                kabkot={kabkot}
+                                setKabkot={setKabkot}
+                                kodePos={kodePos}
+                                setKodepos={setKodePos}
+                                alamat={alamat}
+                                setAlamat={setAlamat}
+                                norek={norek}
+                                setNorek={setNorek}
+                                atasNama={atasNama}
+                                setAtasNama={setAtasNama}
+                                namaBank={namaBank}
+                                setNamaBank={setNamaBank}
+                                tglLahir={tglLahir}
+                                setTglLahir={setTglLahir}
+                                error={error}
+                            />
+                        </section>
+                        <section
+                            id="data-institusi"
+                            className={`${view !== 'institusi' ? 'hidden' : ''}`}
+                        >
+                            <DataInstitusi
+                                institusi={institusi}
+                                setInstitusi={setInstitusi}
+                                statusPekerjaan={statusPekerjaan}
+                                setStatusPekerjaan={setStatusPekerjaan}
+                                masaKerja={masaKerja}
+                                setMasaKerja={setMasaKerja}
+                                golongan={golongan}
+                                setGolongan={setGolongan}
+                                bidangPekerjaan={bidangPekerjaan}
+                                setBidangPekerjaan={setBidangPekerjaan}
+                                error={error}
+                            />
+                        </section>
+                        <section
+                            id="data-institusi"
+                            className={`${view !== 'pendidikan' ? 'hidden' : ''}`}
+                        >
+                            <DataPendidikan
+                                pendidikan={pendidikan}
+                                setPendidikan={setPendidikan}
+                                pdkError={pdkError}
+                            />
+                        </section>
+                        <section
+                            id="data-institusi"
+                            className={`${view !== 'dokumen' ? 'hidden' : ''}`}
+                        >
+                            <Dokumen
+                                cv={cv}
+                                setCv={setCv}
+                                ijazah={ijazah}
+                                setIjazah={setIjazah}
+                                rps={rps}
+                                setRps={setRps}
+                                fotoKtp={fotoKtp}
+                                setFotoKtp={setFotoKtp}
+                                bukuTabungan={bukuTabungan}
+                                setBukuTabungan={setBukuTabungan}
+                                suratKetersediaan={suratKetersediaan}
+                                setSuratKetersediaan={setSuratKetersediaan}
+                                error={error}
+                                dokumen={dokumen}
+                            />
+                        </section>
+                    </section>
+                    <div className="flex justify-end">
+                        <Button
+                            className={`${view !== 'dokumen' ? 'hidden' : ''}`}
+                            type="submit"
+                            onClick={() => {
+                                setLoading(true);
+                            }}
+                        >
+                            Update {loading && <Spinner />}
+                        </Button>
+                        <Button
+                            className={`${view === 'dokumen' ? 'hidden' : ''}`}
+                            type="button"
+                            onClick={() => {
+                                const menu =
+                                    arrayMenu[arrayMenu.indexOf(view) + 1];
+                                handleViewChange(menu);
+                            }}
+                        >
+                            Berikutnya
+                        </Button>
+                    </div>
+                </form>
             </AppLayout>
         </>
     );

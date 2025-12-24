@@ -90,6 +90,12 @@ class DashboardController extends Controller
             ]);
         }
 
+        if ($getMatkul[0]->kuota <= 0) {
+            return redirect()->back()->withErrors([
+                "matkulError" => "Kuota mata kuliah sudah penuh."
+            ]);
+        }
+
         $user = Auth::guard("user_login")->user();
         if ($user->role !== 'tutor') {
             return redirect()->back()->withErrors([
@@ -116,8 +122,8 @@ class DashboardController extends Controller
         $lamaran->status = "PENDING";
         $lamaran->user_id = $user->id;
         $lamaran->matkul_id = $getMatkul[0]->id;
-        Session::flash("success", "Berhasil melamar");
         $lamaran->save();
+        Session::flash("success", "Berhasil melamar");
         return redirect()->intended("/dashboard");
     }
 
@@ -220,20 +226,37 @@ class DashboardController extends Controller
 
     public function updateBiodata(Request $req)
     {
+        Log::debug($req->file("cv") . 'sds');
         $validated = $req->validate([
             "id" => "required|string",
-            'cv' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'ijazah' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'rps' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'fotoKtp' => 'nullable|mimetypes:image/jpg,image/jpeg,image/png,gif,webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'suratKetersediaan' => 'nullable|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'cv' => 'nullable|mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:5120',
+            'ijazah' => 'nullable|mimes:pdf,docx|max:5120',
+            'rps' => 'nullable|mimes:pdf,docx|max:5120',
+            'fotoKtp' => 'nullable|mimetypes:image/jpg,image/jpeg,image/png,image/gif,image/webp,mimes:pdf,docx|max:5120',
+            'bukuTabungan' => 'nullable|mimes:pdf,docx,image/jpg,image/jpeg,image/png,image/gif,image/webp|max:5120',
+            'suratKetersediaan' => 'nullable|mimes:pdf,docx|max:5120',
+        ], [
+            'cv.max' => 'Ukuran file CV maksimal 5MB.',
+            'ijazah.max' => 'Ukuran file Ijazah maksimal 5MB.',
+            'rps.max' => 'Ukuran file RPS maksimal 5MB.',
+            'fotoKtp.max' => 'Ukuran file Foto KTP maksimal 5MB.',
+            'bukuTabungan.max' => 'Ukuran file Buku Tabungan maksimal 5MB.',
+            'suratKetersediaan.max' => 'Ukuran file Surat Ketersediaan maksimal 5MB.',
+            'cv.mimetypes' => 'Format file CV tidak didukung.',
+            'ijazah.mimetypes' => 'Format file Ijazah tidak didukung.',
+            'rps.mimetypes' => 'Format file RPS tidak didukung.',
+            'fotoKtp.mimetypes' => 'Format file Foto KTP tidak didukung.',
+            'bukuTabungan.mimetypes' => 'Format file Buku Tabungan tidak didukung.',
+            'suratKetersediaan.mimetypes' => 'Format file Surat Ketersediaan tidak didukung.',
         ]);
+
         $id = $req->id;
         $user = UserLogin::where("id", $id)->first();
 
-        if (!$user) { {
-                return response()->json("User tidak ada", 400);
-            }
+        if (!$user) {
+            return redirect()->intended("/biodata")->withErrors([
+                "error" => "User tidak ditemukan"
+            ]);
         }
         // Data Pribadi
         $namaLengkap = $req->namaLengkap;
@@ -262,8 +285,7 @@ class DashboardController extends Controller
         $bidangPekerjaan = $req->bidangPekerjaan;
 
         // Pendidikan
-        $pendidikan = $req->pendidikan;
-        $transformPendidikan = json_decode($pendidikan);
+
 
 
         DB::beginTransaction();
@@ -305,9 +327,10 @@ class DashboardController extends Controller
 
             Pendidikan::where('user_id', $id)->delete();
 
+            $pendidikan = $req->pendidikan;
             $dataPendidikan = [];
-            foreach ($transformPendidikan as $key => $value) {
-                array_push($dataPendidikan, [...(array)$value, 'user_id' => $user->id]);
+            foreach ($pendidikan as $item) {
+                $dataPendidikan[] = array_merge((array)$item, ['user_id' => $id]);
             }
 
             Pendidikan::insert($dataPendidikan);
@@ -368,13 +391,12 @@ class DashboardController extends Controller
                 $data
             );
             DB::commit();
-            return response()->json([
-                "data" => 'null',
-                "message" => "Berhasil update biodata",
-                "error" => "false"
-            ], 200);
+            Session::flash("success", "Berhasil update biodata");
+            return redirect()->intended("/biodata");
         } catch (Exception $e) {
-            Log::error($e);
+            return redirect()->intended("/biodata")->withErrors([
+                "error" => "Gagal update biodata"
+            ]);
             DB::rollBack();
         }
     }
@@ -416,8 +438,7 @@ class DashboardController extends Controller
         $nama = $req->query("nama") ?? '';
         $skip = ($currentPage - 1) * $limit;
 
-        $tutors = UserLogin::with(["pribadi"])->whereHas("pribadi", function ($query) use ($nama) {
-            Log::debug($nama);
+        $tutors = UserLogin::with(["pribadi"])->where("role", 'tutor')->whereHas("pribadi", function ($query) use ($nama) {
             $query->where("nama_lengkap", 'ILIKE', "%" . $nama . "%");
         });
         $count = $tutors->count();
@@ -548,11 +569,13 @@ class DashboardController extends Controller
             "prodi_id" => "required|string",
             "kode_matkul" => "required|string",
             "matkul" => "required|string",
+            "kuota" => "required|integer",
             "semester" => "required|string"
         ]);
         $prodi_id = $req->prodi_id;
         $kode_matkul = $req->kode_matkul;
         $matkul = $req->matkul;
+        $kuota = $req->kuota;
         $semester = $req->semester;
 
         $existMatkul = Matkul::where(function ($que) use ($matkul) {
@@ -578,6 +601,7 @@ class DashboardController extends Controller
         $mat->prodi_id = $prodi_id;
         $mat->kode_matkul = $kode_matkul;
         $mat->nama = $matkul;
+        $mat->kuota = $kuota;
         $mat->semester = $semester;
         $mat->save();
         Session::flash("success", 'Berhasil buat matkul');
@@ -586,13 +610,16 @@ class DashboardController extends Controller
 
     public function import_matkul(Request $req)
     {
+        $req->validate([
+            "prodi_id" => "required|string",
+            'file' => 'required|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain|max:5120'
+        ], [
+            'file.required' => 'File wajib diupload.',
+            'file.mimetypes' => 'Tipe file harus .xlsx, .csv, atau .txt.',
+            'file.max' => 'Ukuran file maksimal 5MB.'
+        ]);
         try {
-            $req->validate([
-                "prodi_id" => "required|string",
-                'file' => 'required|mimetypes:text/csv,text/plain,application/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            ]);
             $prodi_id = $req->prodi_id;
-
             $prodi = Prodi::where("id", '=', $prodi_id)->first();
             if (empty($prodi)) {
                 return redirect()->intended("/master-matkul")->withErrors([
@@ -603,11 +630,11 @@ class DashboardController extends Controller
             $rows = Excel::toArray([], $req->file('file'))[0];
 
             $headers = array_map(fn($col) => strtolower(str_replace(" ", "_", $col)), $rows[0]);
-            $allowedColumns = ["nama", "kode_matkul"];
+            $allowedColumns = ["nama", "kuota", "kode_matkul", 'semester'];
             foreach ($headers as $value) {
                 if (!in_array($value, $allowedColumns)) {
                     return redirect()->intended("/master-matkul")->withErrors([
-                        "error" => "Nama Kolom tidak sesuai. Harus 'nama' dan 'kode_matkul'"
+                        "error" => "Nama Kolom tidak sesuai. Harus 'nama', 'kuota', 'kode_matkul', 'semester'"
                     ]);
                 };
             }
@@ -623,8 +650,6 @@ class DashboardController extends Controller
                 $existKodeAndNama[] = $mat->kode_matkul;
             }
 
-            Log::debug($existKodeAndNama);
-
             foreach (array_slice($rows, 1) as $row) {
                 if (in_array($row[1], $existKodeAndNama)) return redirect()->intended("/master-data")->withErrors([
                     "error" => 'Kode ' . $row[1] . " sudah ada"
@@ -637,13 +662,13 @@ class DashboardController extends Controller
             }
 
 
+
             Matkul::insert($result);
-
-
 
             Session::flash("success", 'Berhasil buat matkul');
             return redirect()->intended("/master-matkul");
         } catch (Exception $e) {
+            Log::debug($e);
             return redirect()->intended("/master-matkul")->withErrors([
                 'error' => "Terjadi kesalahan"
             ]);
@@ -729,8 +754,8 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function download_lamaran(Request $req) {
+    public function download_lamaran(Request $req)
+    {
         return Excel::download(new LamaranExport, 'lamaran.xlsx');
-
     }
 }

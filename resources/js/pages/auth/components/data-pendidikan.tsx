@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Pendidikan, PendidikanPayload } from '@/types';
 import { Trash } from 'lucide-react';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, use, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 
 export default function DataPendidikan({
@@ -17,6 +17,7 @@ export default function DataPendidikan({
     setPendidikan: Dispatch<SetStateAction<Array<PendidikanPayload>>>;
     pdkError: Record<string, Partial<Pendidikan>>;
 }) {
+    const [count, setCount] = useState(1);
     const handleTambahPendidikan = () => {
         setPendidikan((prev) => {
             if (pendidikan.length >= 5) return prev;
@@ -34,7 +35,7 @@ export default function DataPendidikan({
         });
     };
     return (
-        <>
+        <div key={count}>
             <div className="flex justify-between">
                 <div className="text-md my-3 font-semibold">
                     Data Pendidikan
@@ -58,7 +59,8 @@ export default function DataPendidikan({
                                     const newPendidikan = pendidikan.filter(
                                         (item, i) => index !== i,
                                     );
-                                    setPendidikan(newPendidikan);
+                                    setCount(count + 1);
+                                    setPendidikan([...newPendidikan]);
                                 }
                             }}
                             className="w-5"
@@ -68,8 +70,8 @@ export default function DataPendidikan({
                         <div className="grid w-full gap-4">
                             <InputComponent
                                 title="Perguruan Tinggi"
-                                id="perguruantinggi"
-                                name="perguruantinggi"
+                                id={`perguruantinggi[${index}]`}
+                                name={`pendidikan[${index}][perguruan_tinggi]`}
                                 type="text"
                                 maxLength={100}
                                 onChange={(value) =>
@@ -85,8 +87,8 @@ export default function DataPendidikan({
                         <div className="grid w-full gap-4">
                             <InputComponent
                                 title="Jenjang"
-                                id="jenjang"
-                                name="jenjang"
+                                id={`jenjang[${index}]`}
+                                name={`pendidikan[${index}][jenjang]`}
                                 type="text"
                                 maxLength={100}
                                 onChange={(value) =>
@@ -102,8 +104,8 @@ export default function DataPendidikan({
                         <div className="grid w-full gap-4">
                             <InputComponent
                                 title="Bidang Studi"
-                                id="bidangstudi"
-                                name="bidangstudi"
+                                id={`bidangstudi[${index}]`}
+                                name={`pendidikan[${index}][bidang_studi]`}
                                 type="text"
                                 maxLength={100}
                                 onChange={(value) =>
@@ -119,8 +121,9 @@ export default function DataPendidikan({
                     </div>
                     <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="grid w-full gap-4">
-                            <Label>Tahun Lulus</Label>
+                            <Label>Tahun Lulus <span className="text-red-500">*</span></Label>
                             <NumericFormat
+                                name={`pendidikan[${index}][tahun_lulus]`}
                                 allowLeadingZeros={false}
                                 allowNegative={false}
                                 customInput={Input}
@@ -137,8 +140,8 @@ export default function DataPendidikan({
                         <div className="grid w-full gap-4">
                             <InputComponent
                                 title="Gelar Depan"
-                                id="gelardepan"
-                                name="gelardepan"
+                                id={`gelardepan[${index}]`}
+                                name={`pendidikan[${index}][gelar_depan]`}
                                 type="text"
                                 maxLength={100}
                                 onChange={(value) =>
@@ -154,8 +157,8 @@ export default function DataPendidikan({
                         <div className="grid w-full gap-4">
                             <InputComponent
                                 title="Gelar Belakang"
-                                id="gelarbelakang"
-                                name="gelarbelakang"
+                                id={`gelarbelakang[${index}]`}
+                                name={`pendidikan[${index}][gelar_belakang]`}
                                 type="text"
                                 maxLength={100}
                                 onChange={(value) =>
@@ -171,6 +174,6 @@ export default function DataPendidikan({
                     </div>
                 </div>
             ))}
-        </>
+        </div>
     );
 }

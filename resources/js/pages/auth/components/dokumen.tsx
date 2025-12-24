@@ -35,7 +35,6 @@ export default function Dokumen({
     error: Record<string, string>;
     dokumen?: DokumenType;
 }) {
-    console.log(dokumen);
     return (
         <>
             <div className="flex justify-between">
@@ -44,7 +43,7 @@ export default function Dokumen({
             <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="grid w-full gap-4">
                     <Label>
-                        CV{' '}
+                        CV{' '} 
                         {dokumen?.cv && (
                             <Download
                                 onClick={() =>
@@ -74,6 +73,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['cv'] ?? ''}
                     </span>
@@ -110,6 +110,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['ijazah'] ?? ''}
                     </span>
@@ -146,6 +147,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['rps'] ?? ''}
                     </span>
@@ -184,6 +186,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX .JPG .JPEG .PNG</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['fotoKtp'] ?? ''}
                     </span>
@@ -220,6 +223,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['bukuTabungan'] ?? ''}
                     </span>
@@ -256,6 +260,7 @@ export default function Dokumen({
                             }
                         }}
                     />
+                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['suratKetersediaan'] ?? ''}
                     </span>

@@ -1,14 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import {
-    Fakultas,
-    LamaranType,
-    Matkul,
-    Prodi,
-    User,
-    type BreadcrumbItem,
-} from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Fakultas, Matkul, Prodi, type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import DialogLamaran from './_components/dialog-lamaran';
 import FormLamaran from './_components/form-lamaran';
@@ -26,7 +19,7 @@ export default function Lamaran({
     prodi,
     matkul,
     role,
-    user_id
+    user_id,
 }: {
     fakultas: Fakultas[];
     prodi: Prodi[];
@@ -57,7 +50,9 @@ export default function Lamaran({
                     <span className="text-sm text-red-500">{flash.error}</span>
                 )}
                 {flash.success && (
-                    <span className="text-sm text-green-500">{flash.success}</span>
+                    <span className="text-sm text-green-500">
+                        {flash.success}
+                    </span>
                 )}
                 {role === 'tutor' && (
                     <FormLamaran
@@ -79,17 +74,30 @@ export default function Lamaran({
                 />
                 <div className="w-full">
                     <span className="font-sans font-semibold">
-                        Data Lamaran &nbsp; <span className='text-xs text-blue-500 cursor-pointer' onClick={() => window.location.href = '/download_lamaran'}>Download Data</span>
+                        Data Lamaran &nbsp;
+                        {role === 'admin' && (
+                            <span
+                                className="cursor-pointer text-xs text-blue-500"
+                                onClick={() =>
+                                    (window.location.href = '/download_lamaran')
+                                }
+                            >
+                                Download Data
+                            </span>
+                        )}
                     </span>
-                    <TableLamaran user_id={role === 'admin' ? undefined : user_id} role={role} />
+                    <TableLamaran
+                        user_id={role === 'admin' ? undefined : user_id}
+                        role={role}
+                    />
                 </div>
                 {role === 'admin' && (
-                <div className="w-full">
-                    <span className="font-sans font-semibold">
-                        Data Tutor
-                    </span>
-                    <TableTutor role={role} />
-                </div>
+                    <div className="w-full">
+                        <span className="font-sans font-semibold">
+                            Data Tutor
+                        </span>
+                        <TableTutor role={role} />
+                    </div>
                 )}
             </div>
         </AppLayout>

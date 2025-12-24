@@ -17,13 +17,9 @@ import { Dispatch, SetStateAction } from 'react';
 export function CustomDatePicker({
     date,
     setDate,
-    fromDate,
-    toDate,
 }: {
     date: Date | undefined;
     setDate: Dispatch<SetStateAction<Date | undefined>>;
-    fromDate?: Date;
-    toDate?: Date;
 }) {
     return (
         <Popover>
@@ -44,12 +40,16 @@ export function CustomDatePicker({
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
+                {/* Hidden input to pass tgl_lahir value in form submission */}
+                
                 <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={setDate}
-                    disabled={(date) => 
-                        date > new Date() || date < new Date('1900-01-01')
+                    onSelect={(selectedDate) => {
+                        setDate(selectedDate || undefined);
+                    }}
+                    disabled={(d) =>
+                        d > new Date() || d < new Date('1900-01-01')
                     }
                     captionLayout="dropdown"
                 />

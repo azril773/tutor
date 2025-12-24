@@ -61,7 +61,6 @@ export default function TableLamaran({
             setData([]);
         } else {
             setData(data);
-            console.log(totalPage)
             setTotalPage(totalPage);
         }
     };

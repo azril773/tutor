@@ -70,7 +70,7 @@ function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
-            <form ref={buttonRef} action="/matkul" method="post">
+            <form ref={buttonRef} action="/matkul" method="post" >
                 <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
@@ -146,6 +146,10 @@ function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
                         <Input title="Mata Kuliah" type="text" name="matkul" />
                     </div>
                     <div className="space-y-2">
+                        <Label>Kuota</Label>
+                        <Input title="Kuota" type="text" name="kuota" />
+                    </div>
+                    <div className="space-y-2">
                         <Label>Kode Mata Kuliah</Label>
                         <Input
                             title="Kode Mata Kuliah"
@@ -174,7 +178,7 @@ function ImportMatkul({ prodi }: { prodi: Prodi[] }) {
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
-            <form ref={buttonRef} action="/import_matkul" method="post">
+            <form ref={buttonRef} action="/import_matkul" method="post" encType="multipart/form-data">
                 <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -282,16 +286,18 @@ function TableMatkul() {
                             <TableHead>Kode Mata Kuliah</TableHead>
                             <TableHead>Nama Mata Kuliah</TableHead>
                             <TableHead>Semester</TableHead>
+                            <TableHead>Kuota</TableHead>
                             <TableHead>Prodi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data.length === 0 && <EmptyState colspan={2} />}
+                        {data.length === 0 && <EmptyState colspan={5} />}
                         {data.map((dt, index) => (
                             <TableRow key={index}>
                                 <TableCell>{dt.kode_matkul ?? '-'}</TableCell>
                                 <TableCell>{dt.nama ?? '-'}</TableCell>
                                 <TableCell>{dt.semester ?? '-'}</TableCell>
+                                <TableCell>{dt.kuota ?? '-'}</TableCell>
                                 <TableCell>{dt.prodi.nama ?? '-'}</TableCell>
                             </TableRow>
                         ))}

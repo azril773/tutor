@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataKota, DataProvinsi } from './utils';
+import { format } from 'date-fns';
 
 export default function DataPribadi({
     namaLengkap,
@@ -146,6 +147,7 @@ export default function DataPribadi({
                     <Label>
                         Tanggal Lahir <span className="text-red-500">*</span>
                     </Label>
+                    <input type="hidden" name="tgl_lahir" value={tglLahir ? format(tglLahir, 'yyyy-MM-dd') : ''} />
                     <CustomDatePicker date={tglLahir} setDate={setTglLahir} />
                     <span className="-mt-2 text-sm text-red-500">
                         {error['tglLahir'] ?? ''}
@@ -277,7 +279,6 @@ export default function DataPribadi({
                         {error['npwp'] ?? ''}
                     </span>
                 </div>
-                
             </div>
             <Separator className="my-4" />
             <span className="text-md font-semibold">Alamat Domisili </span>
@@ -408,16 +409,23 @@ export default function DataPribadi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <InputComponent
-                        defaultValue={namaBank}
-                        title="Nama Bank"
-                        id="namaBank"
+                    <Label>
+                        Bank <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
                         name="namaBank"
-                        type="text"
-                        maxLength={100}
-                        onChange={(value) => setNamaBank(value.target.value)}
-                        required={true}
-                    />
+                        defaultValue={namaBank}
+                        onValueChange={(value) => setNamaBank(value)}
+                    >
+                        <SelectTrigger className="w-[300px]">
+                            <SelectValue placeholder="Bank" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={"value"}>
+                                {"value"}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['namaBank'] ?? ''}
                     </span>
