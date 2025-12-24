@@ -422,7 +422,10 @@ export default function DataPribadi({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value={"value"}>
-                                {"value"}
+                                {"BRI"}
+                            </SelectItem>
+                            <SelectItem value={"BSI"}>
+                                {"BSI"}
                             </SelectItem>
                         </SelectContent>
                     </Select>

@@ -83,8 +83,7 @@
         <div class="content">
             <p>Yth. {{ $namaLengkap }},</p>
             <p>Assalamu’alaikum Wr. Wb.</p>
-            <p>Dengan ini kami sampaikan bahwa setelah melalui proses seleksi, Anda <span style="color: #dc3545; font-weight: bold;">belum lolos</span> sebagai Tutor Online pada Program Studi Pendidikan Jarak Jauh (PJJ) UPT PJJ UIN Siber Syekh Nurjati Cirebon. Kami mengapresiasi minat dan komitmen Anda untuk berpartisipasi dalam program ini.</p>
-            <p>Meskipun demikian, kami mendorong Anda untuk terus mengembangkan diri dan mencoba kesempatan lain di masa depan. Jika ada pertanyaan, silakan hubungi kami.</p>
+            <p>Dengan segala horamat, kami mohon maaf belum bisa merekrut bapak/ibu pada semester ini dikarenakan kuota untuk tutor yang sudah terpenuhi. Namun,  Jika tutor yang mengampu tidak bisa memenuhi kewajiban , kami akan merekomendasikan bapak/ibu sebagai penggantinya</p>
             <p>Terima kasih atas partisipasi dan antusiasme Anda dalam mengikuti seleksi ini. Kami berharap dapat bekerja sama di lain waktu.</p>
             <p>Wassalamu’alaikum Wr. Wb.</p>
         </div>
