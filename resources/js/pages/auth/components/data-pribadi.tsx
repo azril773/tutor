@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
+import { format } from 'date-fns';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { DataKota, DataProvinsi } from './utils';
-import { format } from 'date-fns';
 
 export default function DataPribadi({
     namaLengkap,
@@ -147,7 +147,11 @@ export default function DataPribadi({
                     <Label>
                         Tanggal Lahir <span className="text-red-500">*</span>
                     </Label>
-                    <input type="hidden" name="tgl_lahir" value={tglLahir ? format(tglLahir, 'yyyy-MM-dd') : ''} />
+                    <input
+                        type="hidden"
+                        name="tgl_lahir"
+                        value={tglLahir ? format(tglLahir, 'yyyy-MM-dd') : ''}
+                    />
                     <CustomDatePicker date={tglLahir} setDate={setTglLahir} />
                     <span className="-mt-2 text-sm text-red-500">
                         {error['tglLahir'] ?? ''}
@@ -288,14 +292,12 @@ export default function DataPribadi({
                         Provinsi <span className="text-red-500">*</span>
                     </Label>
                     <Select
-                        defaultValue={nameToCodeProvinsi(provinsi)}
-                        name="provinsi"
+                        defaultValue={provinsi}
+                        name='provinsi'
                         onValueChange={(value) => {
-                            setProvinsi(
-                                DataProvinsi[
-                                    value as keyof typeof DataProvinsi
-                                ],
-                            );
+                            console.log(value);
+                            console.log(value);
+                            setProvinsi(value);
                         }}
                     >
                         <SelectTrigger className="w-[300px]">
@@ -304,7 +306,7 @@ export default function DataPribadi({
                         <SelectContent>
                             {Object.entries(DataProvinsi).map(
                                 ([key, value]) => (
-                                    <SelectItem key={key} value={key}>
+                                    <SelectItem key={value} value={value}>
                                         {value}
                                     </SelectItem>
                                 ),
@@ -421,12 +423,8 @@ export default function DataPribadi({
                             <SelectValue placeholder="Bank" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={"value"}>
-                                {"BRI"}
-                            </SelectItem>
-                            <SelectItem value={"BSI"}>
-                                {"BSI"}
-                            </SelectItem>
+                            <SelectItem value={'value'}>{'BRI'}</SelectItem>
+                            <SelectItem value={'BSI'}>{'BSI'}</SelectItem>
                         </SelectContent>
                     </Select>
                     <span className="-mt-4 text-sm text-red-500">
