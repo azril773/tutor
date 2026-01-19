@@ -73,5 +73,3 @@ Route::middleware(['customAuth'])->group(function () {
         return redirect('/');
     });
 });
-
-require __DIR__ . '/settings.php';
