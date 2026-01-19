@@ -134,5 +134,5 @@ export type LamaranType = {
 
 export type ResponseApi = { data: string; message: string; error: string };
 
-export const BASEURL = 'http://localhost:8000';
+export const BASEURL = 'https://tutor.uinssc.ac.id/';
 export const DEFAULT_ERROR_MESSAGE = 'Terjadi Kesalahan';
