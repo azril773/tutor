@@ -227,21 +227,21 @@ class DashboardController extends Controller
     public function updateBiodata(Request $req)
     {
         Log::debug($req->file("cv") . 'sds');
-        $validated = $req->validate([
+        $req->validate([
             "id" => "required|string",
-            'cv' => 'nullable|mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:5120',
-            'ijazah' => 'nullable|mimes:pdf,docx|max:5120',
-            'rps' => 'nullable|mimes:pdf,docx|max:5120',
-            'fotoKtp' => 'nullable|mimetypes:image/jpg,image/jpeg,image/png,image/gif,image/webp,mimes:pdf,docx|max:5120',
-            'bukuTabungan' => 'nullable|mimes:pdf,docx,image/jpg,image/jpeg,image/png,image/gif,image/webp|max:5120',
-            'suratKetersediaan' => 'nullable|mimes:pdf,docx|max:5120',
+            'cv' => 'nullable|mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:2048',
+            'ijazah' => 'nullable|mimes:pdf,docx|max:2048',
+            'rps' => 'nullable|mimes:pdf,docx|max:2048',
+            'fotoKtp' => 'nullable|mimetypes:image/jpg,image/jpeg,image/png,image/gif,image/webp|max:2048',
+            'bukuTabungan' => 'nullable|mimes:pdf,docx,image/jpg,image/jpeg,image/png,image/gif,image/webp|max:2048',
+            'suratKetersediaan' => 'nullable|mimes:pdf,docx|max:2048',
         ], [
-            'cv.max' => 'Ukuran file CV maksimal 5MB.',
-            'ijazah.max' => 'Ukuran file Ijazah maksimal 5MB.',
-            'rps.max' => 'Ukuran file RPS maksimal 5MB.',
-            'fotoKtp.max' => 'Ukuran file Foto KTP maksimal 5MB.',
-            'bukuTabungan.max' => 'Ukuran file Buku Tabungan maksimal 5MB.',
-            'suratKetersediaan.max' => 'Ukuran file Surat Ketersediaan maksimal 5MB.',
+            'cv.max' => 'Ukuran file CV maksimal 2MB.',
+            'ijazah.max' => 'Ukuran file Ijazah maksimal 2MB.',
+            'rps.max' => 'Ukuran file RPS maksimal 2MB.',
+            'fotoKtp.max' => 'Ukuran file Foto KTP maksimal 2MB.',
+            'bukuTabungan.max' => 'Ukuran file Buku Tabungan maksimal 2MB.',
+            'suratKetersediaan.max' => 'Ukuran file Surat Ketersediaan maksimal 2MB.',
             'cv.mimetypes' => 'Format file CV tidak didukung.',
             'ijazah.mimetypes' => 'Format file Ijazah tidak didukung.',
             'rps.mimetypes' => 'Format file RPS tidak didukung.',

@@ -251,7 +251,7 @@ export default function Biodata({
                     <Separator className="max-w-4 lg:max-w-12" />
                     <div className="flex flex-col items-center">
                         <span className="mb-1 text-xs sm:text-xs/6">
-                            Institusi
+                            Instansi
                         </span>
                         <Button
                             className={`w-5 sm:w-10 ${view === 'institusi' ? 'bg-gray-900' : 'bg-gray-800'} cursor-pointer`}
@@ -293,7 +293,9 @@ export default function Biodata({
                 </div>
                 <div className="mx-5">
                     {Object.values(page.props.errors).map((value) => (
-                    <span className="text-sm text-red-500">{value}</span>
+                        <>
+                    <span className="text-sm text-red-500">{value}</span><br />
+                        </>
                 ))}
                     {page.props.flash.error && (
                         <span className="text-sm text-red-500">

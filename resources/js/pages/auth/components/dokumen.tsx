@@ -43,7 +43,7 @@ export default function Dokumen({
             <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="grid w-full gap-4">
                     <Label>
-                        CV{' '} 
+                        CV{' '}
                         {dokumen?.cv && (
                             <Download
                                 onClick={() =>
@@ -55,6 +55,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="cv"
@@ -67,13 +68,22 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setCv(null);
+                                    return;
+                                }
                                 setCv(file.target.files[0]);
                             } else {
                                 setCv(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
+                    <span className="-mt-3 text-xs opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['cv'] ?? ''}
                     </span>
@@ -92,6 +102,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="ijazah"
@@ -104,13 +115,22 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setIjazah(null);
+                                    return;
+                                }
                                 setIjazah(file.target.files[0]);
                             } else {
                                 setIjazah(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
+                    <span className="-mt-3 text-xs opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['ijazah'] ?? ''}
                     </span>
@@ -129,6 +149,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="rps"
@@ -141,13 +162,22 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setRps(null);
+                                    return;
+                                }
                                 setRps(file.target.files[0]);
                             } else {
                                 setRps(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
+                    <span className="-mt-3 text-xs opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['rps'] ?? ''}
                     </span>
@@ -168,6 +198,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="Foto Ktp"
@@ -180,13 +211,24 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setFotoKtp(null);
+                                    return;
+                                }
                                 setFotoKtp(file.target.files[0]);
                             } else {
                                 setFotoKtp(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX .JPG .JPEG .PNG</span>
+                    <span className="-mt-3 text-xs opacity-70">
+                        .PDF .DOCX .JPG .JPEG .PNG
+                    </span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['fotoKtp'] ?? ''}
                     </span>
@@ -205,6 +247,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="Buku Tabungan"
@@ -217,20 +260,29 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setBukuTabungan(null);
+                                    return;
+                                }
                                 setBukuTabungan(file.target.files[0]);
                             } else {
                                 setBukuTabungan(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
+                    <span className="-mt-3 text-xs opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['bukuTabungan'] ?? ''}
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
                     <Label>
-                        Surat Ketersediaan{' '}
+                        Surat Kesediaan{' '}
                         {dokumen?.surat_ketersediaan && (
                             <Download
                                 onClick={() =>
@@ -242,6 +294,7 @@ export default function Dokumen({
                                 className="h-4 w-4"
                             />
                         )}
+                        <span className='text-sm text-muted-foreground'>* 2MB</span>
                     </Label>
                     <Input
                         title="suratKetersediaan"
@@ -254,13 +307,22 @@ export default function Dokumen({
                                 file.target.files &&
                                 file.target.files.length > 0
                             ) {
+                                if (
+                                    file.target.files[0].size >
+                                    2 * 1024 * 1024
+                                ) {
+                                    alert('FIle tidak boleh lebih dari 2MB');
+                                    file.target.value = '';
+                                    setSuratKetersediaan(null);
+                                    return;
+                                }
                                 setSuratKetersediaan(file.target.files[0]);
                             } else {
                                 setSuratKetersediaan(null);
                             }
                         }}
                     />
-                    <span className="text-xs -mt-3 opacity-70">.PDF .DOCX</span>
+                    <span className="-mt-3 text-xs opacity-70">.PDF .DOCX</span>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['suratKetersediaan'] ?? ''}
                     </span>

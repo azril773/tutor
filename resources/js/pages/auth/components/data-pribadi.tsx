@@ -423,7 +423,7 @@ export default function DataPribadi({
                             <SelectValue placeholder="Bank" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value={'value'}>{'BRI'}</SelectItem>
+                            <SelectItem value={'BRI'}>{'BRI'}</SelectItem>
                             <SelectItem value={'BSI'}>{'BSI'}</SelectItem>
                         </SelectContent>
                     </Select>

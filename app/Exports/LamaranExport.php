@@ -40,6 +40,10 @@ class LamaranExport implements FromCollection, WithMapping, WithHeadings
             $row->user_login->pribadi->nip ?? '-',        // manual field
             $row->user_login->pribadi->nidn ?? '-',        // manual field
             $row->user_login->pribadi->nuptk ?? '-',        // manual field
+            $row->user_login->pribadi->npwp ?? '-',        // manual field
+            $row->user_login->pribadi->norek ?? '-',        // manual field
+            $row->user_login->pribadi->atas_nama ?? '-',        // manual field
+            $row->user_login->pribadi->nama_bank ?? '-',        // manual field
             $row->user_login->institusi->institusi ?? '-',        // manual field
             $row->user_login->institusi->status_pekerjaan ?? '-',        // manual field
             $row->user_login->institusi->masa_kerja ?? '-',        // manual field
@@ -64,7 +68,11 @@ class LamaranExport implements FromCollection, WithMapping, WithHeadings
             'NIP',
             'NIDN',
             'NUPTK',
-            'Institusi',
+            'NPWP',
+            'No Rekening',
+            'Atas Nama',
+            'Bank',
+            'Instansi',
             'Status Pekerjaan',
             'Masa Kerja',
             'Golongan',

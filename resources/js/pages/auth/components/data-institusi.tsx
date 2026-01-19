@@ -1,7 +1,13 @@
 import InputComponent from '@/components/inpur';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Dispatch, SetStateAction } from 'react';
 import { NumericFormat } from 'react-number-format';
 
@@ -32,16 +38,17 @@ export default function DataInstitusi({
 }) {
     return (
         <>
-            <div className="text-md my-3 font-semibold">Data Institusi</div>
+            <div className="text-md my-3 font-semibold">Data Instansi</div>
             <div className="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="grid w-full gap-4">
-                    <InputComponent defaultValue={institusi}
-                        title="Institusi"
+                    <InputComponent
+                        defaultValue={institusi}
+                        title="Instansi"
                         id="institusi"
                         name="institusi"
                         type="text"
                         maxLength={100}
-                        onChange={(value) => setInstitusi(value.target.value)} 
+                        onChange={(value) => setInstitusi(value.target.value)}
                         required={true}
                     />
                     <span className="-mt-4 text-sm text-red-500">
@@ -49,29 +56,38 @@ export default function DataInstitusi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <InputComponent defaultValue={statusPekerjaan}
-                        title="Status Pekerjaan"
-                        id="statusPekerjaan"
+                    <Label>
+                        Status Pekerjaan <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
                         name="statusPekerjaan"
-                        type="text"
-                        maxLength={100}
-                        onChange={(value) =>
-                            setStatusPekerjaan(value.target.value)
-                        }
-                        required={true}
-                    />
+                        defaultValue={statusPekerjaan}
+                        onValueChange={(value) => setStatusPekerjaan(value)}
+                    >
+                        <SelectTrigger className="w-[300px]">
+                            <SelectValue placeholder="Status Pekerjaan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value={'ASN'}>ASN</SelectItem>
+                            <SelectItem value={'P3K'}>P3K</SelectItem>
+                            <SelectItem value={'Non ASN'}>Non ASN</SelectItem>
+                        </SelectContent>
+                    </Select>
                     <span className="-mt-4 text-sm text-red-500">
                         {error['statusPekerjaan'] ?? ''}
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <Label>Masa Kerja <span className="text-red-500">*</span></Label>
-                    <NumericFormat defaultValue={masaKerja}
+                    <Label>
+                        Masa Kerja <span className="text-red-500">*</span>
+                    </Label>
+                    <NumericFormat
+                        defaultValue={masaKerja}
                         allowLeadingZeros={false}
                         allowNegative={false}
                         customInput={Input}
                         onChange={(value) => setMasaKerja(value.target.value)}
-                        name='masaKerja'
+                        name="masaKerja"
                     />
                     <span className="-mt-4 text-sm text-red-500">
                         {error['masaKerja'] ?? ''}
@@ -94,19 +110,19 @@ export default function DataInstitusi({
                             <SelectValue placeholder="Golongan       " />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem key={"III"} value={"III"}>
+                            <SelectItem key={'III'} value={'III'}>
                                 III
                             </SelectItem>
-                            <SelectItem key={"IV"} value={"IV"}>
+                            <SelectItem key={'IV'} value={'IV'}>
                                 IV
                             </SelectItem>
-                            <SelectItem key={"IX"} value={"IX"}>
+                            <SelectItem key={'IX'} value={'IX'}>
                                 IX
                             </SelectItem>
-                            <SelectItem key={"X"} value={"X"}>
+                            <SelectItem key={'X'} value={'X'}>
                                 X
                             </SelectItem>
-                            <SelectItem key={"NON ASN"} value={"NON ASN"}>
+                            <SelectItem key={'NON ASN'} value={'NON ASN'}>
                                 NON ASN
                             </SelectItem>
                         </SelectContent>
@@ -116,7 +132,8 @@ export default function DataInstitusi({
                     </span>
                 </div>
                 <div className="grid w-full gap-4">
-                    <InputComponent defaultValue={bidangPekerjaan}
+                    <InputComponent
+                        defaultValue={bidangPekerjaan}
                         title="Bidang Pekerjaan"
                         id="bidangPekerjaan"
                         name="bidangPekerjaan"
