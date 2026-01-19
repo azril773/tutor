@@ -25,7 +25,7 @@ class SendUser extends Mailable
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
-        $this->logoUrl = 'https://i.ibb.co.com/rR6qw0Hj/Group-3-1.png';
+        $this->logoUrl =  env("APP_URL").'/logoemail.png';
     }
 
     /**

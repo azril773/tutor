@@ -20,7 +20,7 @@ class reject extends Mailable
     public function __construct($namaLengkap)
     {   
         $this->namaLengkap = $namaLengkap;
-        $this->logoUrl = 'https://i.ibb.co.com/rR6qw0Hj/Group-3-1.png';
+        $this->logoUrl = env("APP_URL").'/logoemail.png';
     }
 
     /**
