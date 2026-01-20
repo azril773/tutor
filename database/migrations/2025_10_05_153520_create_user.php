@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create("user_login", function (Blueprint $table) {
-            $table->id(); // Creates Unsigned BigInteger
+            $table->id();
             $table->string("email", 255)->unique();
             $table->string("password", 255);
             $table->string("role", 255)->default("tutor");
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string("email", 100)->nullable(true);
             $table->string("nowa", 50)->nullable(true);
             $table->string("jk", 10)->nullable(true);
-            $table->date("tgl_lahir")->nullable(true); // Removed '200' (dates don't have length)
+            $table->date("tgl_lahir", 200)->nullable(true);
             $table->string("nip", 100)->nullable(true);
             $table->string("nik", 100)->nullable(true);
             $table->string("nuptk", 100)->nullable(true);
@@ -38,14 +38,10 @@ return new class extends Migration
             $table->string("norek", 100)->nullable(true);
             $table->string("atas_nama", 100)->nullable(true);
             $table->string("nama_bank", 100)->nullable(true);
-            
-            // FIX: Changed to unsignedBigInteger to match user_login.id
-            $table->unsignedBigInteger("user_id"); 
-            $table->foreign("user_id")->references("id")->on("user_login")->onDelete('cascade');
-            
+            $table->bigInteger("user_id");
+            $table->foreign("user_id")->references("id")->on("user_login");
             $table->timestamps();
         });
-
         Schema::create('institusi', function (Blueprint $table) {
             $table->id();
             $table->string("institusi", 200);
@@ -53,14 +49,10 @@ return new class extends Migration
             $table->string("masa_kerja", 50);
             $table->string("golongan", 100);
             $table->string("bidang_pekerjaan", 200);
-
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("user_id");
-            $table->foreign("user_id")->references("id")->on("user_login")->onDelete('cascade');
-            
+            $table->bigInteger("user_id");
+            $table->foreign("user_id")->references("id")->on("user_login");
             $table->timestamps();
         });
-
         Schema::create('pendidikan', function (Blueprint $table) {
             $table->id();
             $table->string("perguruan_tinggi", 200);
@@ -69,14 +61,10 @@ return new class extends Migration
             $table->string("tahun_lulus", 100);
             $table->string("gelar_depan", 100);
             $table->string("gelar_belakang", 100);
-
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("user_id");
-            $table->foreign("user_id")->references("id")->on("user_login")->onDelete('cascade');
-            
+            $table->bigInteger("user_id");
+            $table->foreign("user_id")->references("id")->on("user_login");
             $table->timestamps();
         });
-
         Schema::create('dokumen', function (Blueprint $table) {
             $table->id();
             $table->string("cv", 150);
@@ -85,11 +73,8 @@ return new class extends Migration
             $table->string("foto_ktp", 150);
             $table->string("buku_tabungan", 150);
             $table->string("surat_ketersediaan", 150);
-
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("user_id");
-            $table->foreign("user_id")->references("id")->on("user_login")->onDelete('cascade');
-            
+            $table->bigInteger("user_id");
+            $table->foreign("user_id")->references("id")->on("user_login");
             $table->timestamps();
         });
     }
@@ -99,11 +84,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // FIX: Drop tables in reverse order to avoid foreign key errors
-        Schema::dropIfExists('dokumen');
-        Schema::dropIfExists('pendidikan');
-        Schema::dropIfExists('institusi');
-        Schema::dropIfExists('pribadi');
-        Schema::dropIfExists('user_login');
+        Schema::dropIfExists('user');
     }
 };
