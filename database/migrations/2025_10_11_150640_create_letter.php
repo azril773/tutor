@@ -22,11 +22,8 @@ return new class extends Migration
             $table->id();
             $table->string("kode_prodi");
             $table->string("nama");
-            
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("fakultas_id");
-            $table->foreign("fakultas_id")->references("id")->on("fakultas")->onDelete('cascade');
-            
+            $table->bigInteger("fakultas_id");
+            $table->foreign("fakultas_id")->references("id")->on("fakultas");
             $table->timestamps();
         });
 
@@ -34,31 +31,21 @@ return new class extends Migration
             $table->id();
             $table->string("kode_matkul");
             $table->string("nama");
-            $table->string("semester");
-            $table->integer("kuota");
-            
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("prodi_id");
-            $table->foreign("prodi_id")->references("id")->on("prodi")->onDelete('cascade');
-            
+            $table->bigInteger("prodi_id");
+            $table->foreign("prodi_id")->references("id")->on("prodi");
             $table->timestamps();
         });
 
         Schema::create("lamaran", function (Blueprint $table) {
             $table->id();
             $table->string("status");
-            
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("user_id");
-            // Assuming 'user_login' exists from your previous migration
-            $table->foreign("user_id")->references('id')->on("user_login")->onDelete('cascade');
-            
-            // FIX: Changed to unsignedBigInteger
-            $table->unsignedBigInteger("matkul_id");
-            $table->foreign("matkul_id")->references("id")->on("matkul")->onDelete('cascade');
-            
+            $table->bigInteger("user_id");
+            $table->foreign("user_id")->references('id')->on("user_login");
+            $table->bigInteger("matkul_id");
+            $table->foreign("matkul_id")->references("id")->on("matkul");
             $table->timestamps();
         });
+
     }
 
     /**
@@ -66,10 +53,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // FIX: Drop tables in reverse order (child first, then parent)
-        Schema::dropIfExists('lamaran');
-        Schema::dropIfExists('matkul');
-        Schema::dropIfExists('prodi');
-        Schema::dropIfExists('fakultas');
+        Schema::dropIfExists('letter');
     }
 };
