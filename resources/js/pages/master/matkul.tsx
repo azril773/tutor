@@ -24,6 +24,10 @@ import { useEffect, useRef, useState } from 'react';
 import { GetMatkul } from '../_api/master-data';
 import DialogComponent from '../_components/dialog-component';
 import EmptyState from '../auth/components/empty-state';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { NumericFormat } from 'react-number-format';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -147,7 +151,7 @@ function MatkulComponent({ prodi }: { prodi: Prodi[] }) {
                     </div>
                     <div className="space-y-2">
                         <Label>Kuota</Label>
-                        <Input title="Kuota" type="text" name="kuota" />
+                        <NumericFormat allowLeadingZeros={true} allowNegative={false} customInput={Input} title="Kuota" type="text" name="kuota" />
                     </div>
                     <div className="space-y-2">
                         <Label>Kode Mata Kuliah</Label>
@@ -239,6 +243,8 @@ function TableMatkul() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [nama, setNama] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [deleteId, setDeleteId] = useState<string>('');
 
     const loadData = async () => {
         const { data, totalPage, error } = await GetMatkul({
@@ -288,6 +294,7 @@ function TableMatkul() {
                             <TableHead>Semester</TableHead>
                             <TableHead>Kuota</TableHead>
                             <TableHead>Prodi</TableHead>
+                            <TableHead></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -299,6 +306,40 @@ function TableMatkul() {
                                 <TableCell>{dt.semester ?? '-'}</TableCell>
                                 <TableCell>{dt.kuota ?? '-'}</TableCell>
                                 <TableCell>{dt.prodi.nama ?? '-'}</TableCell>
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className="h-8 w-8 p-0"
+                                            >
+                                                <span className="sr-only">
+                                                    Open menu
+                                                </span>
+                                                <MoreHorizontal />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    window.location.href = `/matkul/${dt.id}/edit`;
+                                                }}
+                                            >
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setDeleteId(
+                                                        dt.id.toString() ?? '',
+                                                    );
+                                                    setIsOpen(true);
+                                                }}
+                                            >
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -313,6 +354,36 @@ function TableMatkul() {
                     />
                 </div>
             </div>
+            <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
+                        <div className="mt-2 flex justify-end">
+                            <form
+                                action={`/matkul/${deleteId}/delete`}
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={csrf_token}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value={deleteId}
+                                />
+                                <Button
+                                    className="cursor-pointer"
+                                    onClick={() => {}}
+                                >
+                                    Hapus
+                                </Button>
+                            </form>
+                        </div>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

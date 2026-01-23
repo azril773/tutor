@@ -35,8 +35,17 @@ Route::middleware(['customAuth','adminAuth'])->group(function () {
     Route::get("master-matkul", [DashboardController::class, "masterMatkul"])->name("masterMatkulPage");
     
     Route::get("fakultas", [DashboardController::class, "getFakultas"])->name("get_fakultas");
+    Route::get("fakultas/{id}/edit", [DashboardController::class, "editFakultas"])->name("edit_fakultas");
+    Route::post("fakultas/edit", [DashboardController::class, "prosesEditFakultas"])->name("proses_edit_fakultas");
+    Route::post("fakultas/{id}/delete", [DashboardController::class, "prosesDeleteFakultas"])->name("proses_delete_fakultas");
     Route::get("prodi", [DashboardController::class, "getProdi"])->name("get_prodi");
+    Route::get("prodi/{id}/edit", [DashboardController::class, "editProdi"])->name("edit_prodi");
+    Route::post("prodi/edit", [DashboardController::class, "prosesEditProdi"])->name("proses_edit_prodi");
+    Route::post("prodi/{id}/delete", [DashboardController::class, "prosesDeleteProdi"])->name("proses_delete_prodi");
     Route::get("matkul", [DashboardController::class, "getMatkul"])->name("get_matkul");
+    Route::get("matkul/{id}/edit", [DashboardController::class, "editMatkul"])->name("edit_matkul");
+    Route::post("matkul/edit", [DashboardController::class, "prosesEditMatkul"])->name("proses_edit_matkul");
+    Route::post("matkul/{id}/delete", [DashboardController::class, "prosesDeleteMatkul"])->name("proses_delete_matkul");
     Route::post("fakultas", [DashboardController::class, "fakultas"])->name("add_fakultas");
     Route::post("prodi", [DashboardController::class, "prodi"])->name("add_prodi");
     Route::post("matkul", [DashboardController::class, "matkul"])->name("add_matkul");

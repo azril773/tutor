@@ -1,4 +1,3 @@
-import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import PaginationStateful from '@/components/custom/pagination-stateful';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,11 +19,14 @@ import {
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Fakultas, Prodi } from '@/types';
-import { Form, Head, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { GetProdi } from '../_api/master-data';
 import DialogComponent from '../_components/dialog-component';
 import EmptyState from '../auth/components/empty-state';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -65,12 +67,12 @@ export default function ProdiPage({ fakultas }: { fakultas: Fakultas[] }) {
 }
 
 function ProdiComponent({ fakultas }: { fakultas: Fakultas[] }) {
-    const csrf_token = usePage().props.csrf_token
+    const csrf_token = usePage().props.csrf_token;
     const [open, setOpen] = useState<boolean>(false);
     const buttonRef = useRef<HTMLFormElement>(null);
     return (
         <>
-            <form ref={buttonRef} action='/prodi' method="post">
+            <form ref={buttonRef} action="/prodi" method="post">
                 <input type="hidden" name="_token" value={csrf_token} />
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                     <div className="space-y-2">
@@ -125,6 +127,8 @@ function TableProdi() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [nama, setNama] = useState<string>('');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [deleteId, setDeleteId] = useState<string>('');
 
     const loadData = async () => {
         const { data, totalPage, error } = await GetProdi({
@@ -172,6 +176,9 @@ function TableProdi() {
                             <TableHead>Kode Prodi</TableHead>
                             <TableHead>Nama Prodi</TableHead>
                             <TableHead>Fakultas</TableHead>
+                            <TableHead>
+                                {' '}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -181,6 +188,40 @@ function TableProdi() {
                                 <TableCell>{dt.kode_prodi ?? '-'}</TableCell>
                                 <TableCell>{dt.nama ?? '-'}</TableCell>
                                 <TableCell>{dt.fakultas.nama ?? '-'}</TableCell>
+                                <TableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className="h-8 w-8 p-0"
+                                            >
+                                                <span className="sr-only">
+                                                    Open menu
+                                                </span>
+                                                <MoreHorizontal />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    window.location.href = `/prodi/${dt.id}/edit`;
+                                                }}
+                                            >
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setDeleteId(
+                                                        dt.id.toString() ?? '',
+                                                    );
+                                                    setIsOpen(true);
+                                                }}
+                                            >
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -195,6 +236,36 @@ function TableProdi() {
                     />
                 </div>
             </div>
+            <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Apakah anda sudah yakin?</DialogTitle>
+                        <div className="mt-2 flex justify-end">
+                            <form
+                                action={`/prodi/${deleteId}/delete`}
+                                method="post"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="_token"
+                                    value={csrf_token}
+                                />
+                                <input
+                                    type="hidden"
+                                    name="id"
+                                    value={deleteId}
+                                />
+                                <Button
+                                    className="cursor-pointer"
+                                    onClick={() => {}}
+                                >
+                                    Hapus
+                                </Button>
+                            </form>
+                        </div>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

@@ -685,6 +685,69 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function editFakultas(Request $req, string $id)
+    {
+        $fakultasData = Fakultas::where("id", $id)->first();
+        if (empty($fakultasData)) {
+            return redirect()->intended('/master-fakultas')->withErrors([
+                "error" => "Fakultas tidak ditemukan"
+            ]);
+        };
+        return Inertia::render("master/edit/fakultas", [
+            'fakultas' => $fakultasData
+        ]);
+    }
+
+    public function prosesDeleteFakultas(Request $req, string $id)
+    {
+        $fakultasData = Fakultas::where("id", $id)->first();
+        if (empty($fakultasData)) {
+            return redirect()->intended('/master-fakultas')->withErrors([
+                "error" => "Fakultas tidak ditemukan"
+            ]);
+        };
+        $fakultasData->delete();
+        Session::flash("success", 'Berhasil hapus fakultas');
+        return redirect()->intended("/master-fakultas");
+    }
+
+    public function prosesEditFakultas(Request $req)
+    {
+        $req->validate([
+            "id" => "required|string",
+            "kode_fakultas" => "required|string",
+            "fakultas" => "required|string"
+        ]);
+
+        $kode_fakultas = $req->kode_fakultas;
+        $fakultas = $req->fakultas;
+
+        $fakultasData = Fakultas::where("id", $req->id)->first();
+        if (empty($fakultasData)) {
+            return redirect()->intended('/master-fakultas')->withErrors([
+                "error" => "Fakultas tidak ditemukan"
+            ]);
+        };
+
+        $existFakultas = Fakultas::whereNot("id", $req->id)->where(function ($que) use ($fakultas) {
+            $que->where("nama", 'ILIKE', $fakultas)->orWhere("kode_fakultas", 'ILIKE', $fakultas);
+        })->first();
+        $existKodeFakultas = Fakultas::whereNot("id", $req->id)->where(function ($que) use ($kode_fakultas) {
+            $que->where("nama", 'ILIKE', $kode_fakultas)->orWhere("kode_fakultas", 'ILIKE', $kode_fakultas);
+        })->first();
+        if (!empty($existFakultas) || !empty($existKodeFakultas)) {
+            return redirect()->intended('/fakultas/'.$req->id.'/edit')->withErrors([
+                "error" => "Fakultas sudah ada"
+            ]);
+        };
+
+        $fakultasData->kode_fakultas = $kode_fakultas;
+        $fakultasData->nama = $fakultas;
+        $fakultasData->save();
+        Session::flash("success", 'Berhasil edit fakultas');
+        return redirect()->intended("/master-fakultas");
+    }
+
     public function getProdi(Request $req)
     {
         $limit = 10;
@@ -704,6 +767,80 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function editProdi(Request $req, string $id)
+    {
+        $prodiData = Prodi::with("fakultas")->where("id", $id)->first();
+        $fakultas = Fakultas::get();
+        if (empty($prodiData)) {
+            return redirect()->intended('/master-prodi')->withErrors([
+                "error" => "Prodi tidak ditemukan"
+            ]);
+        };
+        return Inertia::render("master/edit/prodi", [
+            'prodi' => $prodiData,
+            'fakultas' => $fakultas
+        ]);
+    }
+
+    public function prosesEditProdi(Request $req)
+    {
+        $req->validate([
+            "id" => "required|string",
+            "fakultas_id" => "required|string",
+            "kode_prodi" => "required|string",
+            "prodi" => "required|string"
+        ]);
+
+        $fakultas_id = $req->fakultas_id;
+        $kode_prodi = $req->kode_prodi;
+        $prodi = $req->prodi;
+
+        $prodiData = Prodi::where("id", $req->id)->first();
+        if (empty($prodiData)) {
+            return redirect()->intended('/master-prodi')->withErrors([
+                "error" => "Prodi tidak ditemukan"
+            ]);
+        };
+
+        $existProdi = Prodi::whereNot("id", $req->id)->where(function ($que) use ($prodi) {
+            $que->where("nama", 'ILIKE', $prodi)->orWhere("kode_prodi", 'ILIKE', $prodi);
+        })->first();
+        $existKodeProdi = Prodi::whereNot("id", $req->id)->where(function ($que) use ($kode_prodi) {
+            $que->where("nama", 'ILIKE', $kode_prodi)->orWhere("kode_prodi", 'ILIKE', $kode_prodi);
+        })->first();
+        if (!empty($existProdi) || !empty($existKodeProdi)) {
+            return redirect()->intended('/prodi/'.$req->id.'/edit')->withErrors([
+                "error" => "Prodi sudah ada"
+            ]);
+        };
+
+        $fakultas = Fakultas::where("id", '=', $fakultas_id)->first();
+        if (empty($fakultas)) {
+            return redirect()->intended("/prodi/".$req->id."/edit")->withErrors([
+                "error" => "Fakultas tidak ada"
+            ]);
+        };
+
+        $prodiData->fakultas_id = $fakultas_id;
+        $prodiData->kode_prodi = $kode_prodi;
+        $prodiData->nama = $prodi;
+        $prodiData->save();
+        Session::flash("success", 'Berhasil edit prodi');
+        return redirect()->intended("/master-prodi");
+    }
+
+    public function prosesDeleteProdi(Request $req) {
+        $prodiData = Prodi::where("id", $req->id)->first();
+        if (empty($prodiData)) {
+            return redirect()->intended('/master-prodi')->withErrors([
+                "error" => "Prodi tidak ditemukan"
+            ]);
+        };
+        $prodiData->delete();
+        Session::flash("success", 'Berhasil hapus prodi');
+        return redirect()->intended("/master-prodi");
+    }
+
     public function getMatkul(Request $req)
     {
         $limit = 10;
@@ -721,6 +858,87 @@ class DashboardController extends Controller
             "data" => $matkul->skip($skip)->take($limit)->get(),
             "totalPage" => ceil($count / $limit)
         ]);
+    }
+
+    public function editMatkul(Request $req, string $id)
+    {
+        $matkulData = Matkul::with("prodi", "prodi.fakultas")->where("id", $id)->first();
+        $prodi = Prodi::with("fakultas")->get();
+        if (empty($matkulData)) {
+            return redirect()->intended('/master-matkul')->withErrors([
+                "error" => "Matkul tidak ditemukan"
+            ]);
+        };
+        return Inertia::render("master/edit/matkul", [
+            'matkul' => $matkulData,
+            'prodi' => $prodi
+        ]);
+    }
+    
+    public function prosesEditMatkul(Request $req)
+    {
+        $req->validate([
+            "id" => "required|string",
+            "prodi_id" => "required|string",
+            "kode_matkul" => "required|string",
+            "matkul" => "required|string",
+            "kuota" => "required|integer",
+            "semester" => "required|string"
+        ]);
+
+        $prodi_id = $req->prodi_id;
+        $kode_matkul = $req->kode_matkul;
+        $matkul = $req->matkul;
+        $kuota = $req->kuota;
+        $semester = $req->semester;
+
+        $matkulData = Matkul::where("id", $req->id)->first();
+        if (empty($matkulData)) {
+            return redirect()->intended('/master-matkul')->withErrors([
+                "error" => "Matkul tidak ditemukan"
+            ]);
+        };
+
+        $existMatkul = Matkul::whereNot("id", $req->id)->where(function ($que) use ($matkul) {
+            $que->where("nama", 'ILIKE', $matkul)->orWhere("kode_matkul", 'ILIKE', $matkul);
+        })->first();
+        $existKodeMatkul = Matkul::whereNot("id", $req->id)->where(function ($que) use ($kode_matkul) {
+            $que->where("nama", 'ILIKE', $kode_matkul)->orWhere("kode_matkul", 'ILIKE', $kode_matkul);
+        })->first();
+        if (!empty($existMatkul) || !empty($existKodeMatkul)) {
+            return redirect()->intended('/matkul/'.$req->id.'/edit')->withErrors([
+                "error" => "Matkul sudah ada"
+            ]);
+        };
+
+        $prodi = Prodi::where("id", '=', $prodi_id)->first();
+        if (empty($prodi)) {
+            return redirect()->intended('/matkul/'.$req->id.'/edit')->withErrors([
+                "error" => "Prodi tidak ada"
+            ]);
+        };
+
+        $matkulData->prodi_id = $prodi_id;
+        $matkulData->kode_matkul = $kode_matkul;
+        $matkulData->nama = $matkul;
+        $matkulData->kuota = $kuota;
+        $matkulData->semester = $semester;
+        $matkulData->save();
+        Session::flash("success", 'Berhasil edit matkul');
+        return redirect()->intended("/master-matkul");
+    }
+
+    public function prosesDeleteMatkul(Request $req, string $id)
+    {
+        $matkulData = Matkul::where("id", $id)->first();
+        if (empty($matkulData)) {
+            return redirect()->intended('/master-matkul')->withErrors([
+                "error" => "Matkul tidak ditemukan"
+            ]);
+        };
+        $matkulData->delete();
+        Session::flash("success", 'Berhasil hapus matkul');
+        return redirect()->intended("/master-matkul");
     }
 
     public function masterFakultas(Request $req)
