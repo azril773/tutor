@@ -22,7 +22,7 @@ export async function GetFakultas({
     })
 
     try {
-        const response = await fetch(`${BASEURL}/fakultas?${searchParams.toString()}`, {
+        const response = await fetch(`/fakultas?${searchParams.toString()}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,
@@ -68,7 +68,7 @@ export async function GetProdi({
     })
 
     try {
-        const response = await fetch(`${BASEURL}/prodi?${searchParams.toString()}`, {
+        const response = await fetch(`/prodi?${searchParams.toString()}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,
@@ -113,7 +113,7 @@ export async function GetMatkul({
     })
 
     try {
-        const response = await fetch(`${BASEURL}/matkul?${searchParams.toString()}`, {
+        const response = await fetch(`/matkul?${searchParams.toString()}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,

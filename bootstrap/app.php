@@ -34,7 +34,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (HttpException $e, Request $request) {
             if ($e->getStatusCode() === 413) {
-                Log::debug("File size exceeded limit");
                 return redirect()
                     ->intended('/biodata')
                     ->withErrors(['error' => 'Total ukuran file melebihi batas maksimal 20MB.']);

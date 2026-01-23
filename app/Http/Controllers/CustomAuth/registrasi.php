@@ -65,7 +65,6 @@ class registrasi extends Controller
             Session::flash("success","Berhasil login. Silahkan cek email anda.");
             return redirect()->intended("/");
         } catch (Exception $err) {
-            Log::debug($err);
             Session::flash("error", "Gagal registrasi");
             DB::rollBack();
         }

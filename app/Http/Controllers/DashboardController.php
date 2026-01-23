@@ -59,7 +59,6 @@ class DashboardController extends Controller
         $institusi = Institusi::where("user_id", $user->id)->first();
         $pendidikan = Pendidikan::where("user_id", $user->id)->get();
         $dokumen = Dokumen::where("user_id", $user->id)->first();
-        Log::debug($dokumen);
         return Inertia::render("custom/biodata", [
             "idUser" => $user->id,
             "role" => $role,
@@ -80,7 +79,6 @@ class DashboardController extends Controller
         ]);
 
         $matkul = $req->matkul;
-        Log::debug($matkul);
         $semester = $req->semester;
         $getMatkul = Matkul::where("kode_matkul", $matkul)->where("semester", $semester)->get();
 
@@ -135,7 +133,6 @@ class DashboardController extends Controller
 
     public function approveLamaran(Request $req)
     {
-        Log::debug($req);
         $validated = $req->validate([
             "id" => "required|string"
         ]);
@@ -149,7 +146,6 @@ class DashboardController extends Controller
         $id = $req->id;
 
         $lamaran = Lamaran::with("user_login", "user_login.pribadi")->findOrFail($id);
-        Log::debug($lamaran);
         $lamaran->update([
             "status" => "APPROVED"
         ]);
@@ -173,7 +169,6 @@ class DashboardController extends Controller
         $id = $req->id;
 
         $lamaran = Lamaran::with("user_login", "user_login.pribadi")->findOrFail($id);
-        Log::debug($lamaran);
         $lamaran->update([
             "status" => "REJECTED"
         ]);
@@ -226,7 +221,6 @@ class DashboardController extends Controller
 
     public function updateBiodata(Request $req)
     {
-        Log::debug($req->file("cv") . 'sds');
         $req->validate([
             "id" => "required|string",
             'cv' => 'nullable|mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:2048',
@@ -290,7 +284,6 @@ class DashboardController extends Controller
 
         DB::beginTransaction();
         try {
-            Log::debug($nuptk . ' ' . $npwp);
             Pribadi::updateOrCreate(
                 ["user_id" => $id],
                 [
@@ -405,7 +398,6 @@ class DashboardController extends Controller
     {
         $user = Auth::guard("user_login")->user();
         if ($user->role === "tutor") {
-            Log::debug($user->id != $id);
             if ($user->id != $id) return redirect()->intended("/dashboard");
             $tutor = UserLogin::with(["pribadi", 'institusi', 'pendidikan', 'dokumen'])->where("id", $id)->first();
         } else {
@@ -668,7 +660,6 @@ class DashboardController extends Controller
             Session::flash("success", 'Berhasil buat matkul');
             return redirect()->intended("/master-matkul");
         } catch (Exception $e) {
-            Log::debug($e);
             return redirect()->intended("/master-matkul")->withErrors([
                 'error' => "Terjadi kesalahan"
             ]);

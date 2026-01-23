@@ -24,7 +24,6 @@ class login extends Controller
             "password" => ["required", "string"]
         ]);
         if (Auth::guard("user_login")->attempt($credentials)) {
-            Log::debug($credentials);
             $req->session()->regenerate();
             return redirect()->intended(route('dashboard', absolute: false));
         }

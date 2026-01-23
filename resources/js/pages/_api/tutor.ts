@@ -20,7 +20,7 @@ export async function GetTutors({
     })
 
     try {
-        const response = await fetch(`${BASEURL}/tutors?${searchParams.toString()}`, {
+        const response = await fetch(`/tutors?${searchParams.toString()}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,

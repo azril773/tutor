@@ -20,7 +20,6 @@ class LamaranExport implements FromCollection, WithMapping, WithHeadings
     // DATA SUDAH SIAP, TIDAK QUERY DB
     public function collection()
     {
-        Log::debug(json_encode($this->data));
         return collect($this->data);
     }
 

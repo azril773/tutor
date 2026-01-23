@@ -26,7 +26,7 @@ export async function GetApplications({
     }
 
     try {
-        const response = await fetch(`${BASEURL}/applications?${searchParams.toString()}`, {
+        const response = await fetch(`/applications?${searchParams.toString()}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,
