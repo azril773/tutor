@@ -31,6 +31,8 @@ return new class extends Migration
             $table->id();
             $table->string("kode_matkul");
             $table->string("nama");
+            $table->string("semester");
+            $table->integer("kuota");
             $table->bigInteger("prodi_id");
             $table->foreign("prodi_id")->references("id")->on("prodi");
             $table->timestamps();
